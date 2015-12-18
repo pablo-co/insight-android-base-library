@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">library</string>
+
+    <!-- Loading -->
+    <string name="loading_title">Loading...</string>
+    <string name="loading_content">Loading...</string>
+</resources>
