@@ -34,25 +34,27 @@ import java.util.HashMap;
 
 
 public class Location implements JSONable {
-
     public static final String JSON_WRAPPER = "trace";
     public static final String JSON_LATITUDE = "lat";
     public static final String JSON_LONGITUDE = "lng";
     public static final String JSON_SPEED = "speed";
     public static final String JSON_TIME = "time";
     public static final String JSON_ROUTE_ID = "route_id";
+    public static final String JSON_CSTOP_ID = "cstop_id";
 
     protected Double mLatitude;
     protected Double mLongitude;
     protected Float mSpeed;
     protected Long mTime;
     protected Long mRouteId;
+    protected Long mCStopId;
 
     public Location() {
         mLatitude = null;
         mLongitude = null;
         mRouteId = null;
         mSpeed = null;
+        mCStopId = null;
         measureTime();
     }
 
@@ -61,6 +63,7 @@ public class Location implements JSONable {
         mLongitude = location.getLongitude();
         mSpeed = null;
         mRouteId = null;
+        mCStopId = null;
         measureTime();
     }
 
@@ -69,6 +72,7 @@ public class Location implements JSONable {
         mLongitude = location.getLongitude();
         mSpeed = speed;
         mRouteId = null;
+        mCStopId = null;
         measureTime();
     }
 
@@ -83,7 +87,9 @@ public class Location implements JSONable {
 
     public Location(Double latitude, Double longitude) {
         mLatitude = latitude;
-        mRouteId = null;
+        mLongitude = longitude;
+        mSpeed = 10.0f;
+        mRouteId = Long.valueOf(419);
         measureTime();
     }
 
@@ -127,6 +133,14 @@ public class Location implements JSONable {
         mRouteId = driveTime;
     }
 
+    public Long getCStopId() {
+        return mCStopId;
+    }
+
+    public void setCStopId(Long CStopId) {
+        mCStopId = CStopId;
+    }
+
     public void measureTime() {
         mTime = System.currentTimeMillis();
     }
@@ -142,6 +156,7 @@ public class Location implements JSONable {
         object.put(JSON_SPEED, mSpeed);
         object.put(JSON_TIME, mTime);
         object.put(JSON_ROUTE_ID, mRouteId);
+        object.put(JSON_CSTOP_ID, mCStopId);
         return object;
     }
 
@@ -158,6 +173,7 @@ public class Location implements JSONable {
         object.put(JSON_SPEED, mSpeed);
         object.put(JSON_TIME, mTime);
         object.put(JSON_ROUTE_ID, mRouteId);
+        object.put(JSON_CSTOP_ID, mCStopId);
 
         RequestParams params = new RequestParams();
         params.put(JSON_WRAPPER, object);

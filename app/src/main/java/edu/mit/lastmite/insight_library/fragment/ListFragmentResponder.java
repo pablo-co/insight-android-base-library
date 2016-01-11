@@ -31,9 +31,8 @@ import edu.mit.lastmite.insight_library.communication.TargetResponder;
 import edu.mit.lastmite.insight_library.util.ApplicationComponent;
 
 public class ListFragmentResponder extends DaggerListFragment implements TargetResponder {
-
-    int mRequestCode;
-    TargetListener mTargetListener;
+    protected int mRequestCode;
+    protected TargetListener mTargetListener;
 
     @Override
     public int getRequestCode() {
@@ -56,9 +55,7 @@ public class ListFragmentResponder extends DaggerListFragment implements TargetR
         mRequestCode = requestCode;
     }
 
-
     @Override
     public void injectFragment(ApplicationComponent component) {
     }
-
 }

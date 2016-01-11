@@ -51,6 +51,7 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -65,28 +66,13 @@ import java.util.Map;
  * problems or functionality.
  */
 public class Helper {
-
-    private float mDensity;
-    private Context mContext;
-    private DecimalFormat mDecimalFormat;
-    private DecimalFormat mIntegerFormat;
-    private static Helper sHelper;
+    protected float mDensity;
+    protected Context mContext;
+    protected DecimalFormat mDecimalFormat;
+    protected DecimalFormat mIntegerFormat;
 
     public interface FragmentCreator {
         Fragment createFragment();
-    }
-
-    /**
-     * Class interface for the Singleton Design Pattern.
-     *
-     * @param context
-     * @return
-     */
-    public static Helper get(Context context) {
-        if (sHelper == null) {
-            sHelper = new Helper(context);
-        }
-        return sHelper;
     }
 
     public Helper(Context context) {
@@ -457,6 +443,16 @@ public class Helper {
         params.height = height;
         listView.setLayoutParams(params);
         listView.requestLayout();
+    }
+
+    public String getDateStringFromTimestamp(long timestamp) {
+        try {
+            DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
+            Date netDate = (new Date(timestamp));
+            return dateFormat.format(netDate);
+        } catch (Exception ex) {
+            return "Unknown date";
+        }
     }
 
 }

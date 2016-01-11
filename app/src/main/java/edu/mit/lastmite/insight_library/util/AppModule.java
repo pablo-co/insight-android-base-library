@@ -52,7 +52,18 @@ public class AppModule {
     @Provides
     @Singleton
     NetworkTaskQueue provideNetworkTaskQueue(Application application, Gson gson, Bus bus) {
-        NetworkTaskQueue queue = NetworkTaskQueue.create(application, gson, bus);
-        return queue;
+        return NetworkTaskQueue.create(application, gson, bus);
+    }
+
+    @Provides
+    @Singleton
+    Helper provideHelper(Application application) {
+        return new Helper(application);
+    }
+
+    @Provides
+    @Singleton
+    Storage provideStorage(Application application) {
+        return new Storage(application);
     }
 }

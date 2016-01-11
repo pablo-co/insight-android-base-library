@@ -26,6 +26,8 @@
 package edu.mit.lastmite.insight_library.http;
 
 import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Looper;
 import android.util.Log;
 
@@ -162,7 +164,6 @@ public class APIFetch {
         client.patch(getApiAbsoluteUrl(url), params, responseHandler);
     }
 
-
     /**
      * Same as {@link #get(String, RequestParams, AsyncHttpResponseHandler)} but for the DELETE HTTP verb.
      *
@@ -187,6 +188,12 @@ public class APIFetch {
         AsyncHttpClient client = getClient();
         client.setTimeout(timeOut);
         client.delete(getApiAbsoluteUrl(url), params, responseHandler);
+    }
+
+    public boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager = (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 
     /**

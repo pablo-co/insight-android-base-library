@@ -5,66 +5,99 @@ import android.content.Intent;
 
 import com.google.gson.Gson;
 import com.squareup.otto.Bus;
-import com.squareup.otto.Produce;
 import com.squareup.tape.FileObjectQueue;
-import com.squareup.tape.ObjectQueue;
 import com.squareup.tape.TaskQueue;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
+import edu.mit.lastmite.insight_library.service.NetworkQueueService;
 import edu.mit.lastmite.insight_library.task.NetworkTask;
 
 
 public class NetworkTaskQueue extends TaskQueue<NetworkTask> {
-    private static final String FILENAME = "network_task_queue";
+    public static final String FILENAME = "network_task_queue";
 
-    private final Context context;
-    private final Bus bus;
+    protected transient final Context mContext;
+    protected transient final Bus mBus;
+    protected transient final FileObjectQueue<NetworkTask> mDelegate;
+    protected final String mFileName;
 
-    private NetworkTaskQueue(ObjectQueue<NetworkTask> delegate, Context context, Bus bus) {
+    public NetworkTaskQueue(FileObjectQueue<NetworkTask> delegate, Context context, Bus bus, String fileName) {
         super(delegate);
-        this.context = context;
-        this.bus = bus;
-        bus.register(this);
+        mDelegate = delegate;
+        mContext = context;
+        mBus = bus;
+        mFileName = fileName;
+    }
 
+    public void startServiceIfNotEmpty() {
         if (size() > 0) {
             startService();
         }
     }
 
-    private void startService() {
-        context.startService(new Intent(context, NetworkQueueService.class));
+    public void startService() {
+        Intent intent = new Intent(mContext, NetworkQueueService.class);
+        intent.putExtra(NetworkQueueService.EXTRA_QUEUE_NAME, mFileName);
+        mContext.startService(intent);
     }
 
     @Override
     public void add(NetworkTask entry) {
         super.add(entry);
-        bus.post(produceSizeChanged());
-        startService();
+        produceSizeChanged();
     }
 
     @Override
     public void remove() {
         super.remove();
-        bus.post(produceSizeChanged());
+        produceSizeChanged();
     }
 
     @SuppressWarnings("UnusedDeclaration")
-    @Produce
-    public NetworkQueueSizeEvent produceSizeChanged() {
-        return new NetworkQueueSizeEvent(size());
+    public String getFileName() {
+        return mFileName;
     }
 
+    @SuppressWarnings("UnusedDeclaration")
+    public List<NetworkTask> peek(int max) {
+        return mDelegate.peek(max);
+    }
+
+    @SuppressWarnings("UnusedDeclaration")
+    public void produceSizeChanged() {
+        mBus.post(new NetworkQueueSizeEvent(size()));
+    }
+
+    @SuppressWarnings("UnusedDeclaration")
     public static NetworkTaskQueue create(Context context, Gson gson, Bus bus) {
-        FileObjectQueue.Converter<NetworkTask> converter = new GsonConverter<NetworkTask>(gson, NetworkTask.class);
-        File queueFile = new File(context.getFilesDir(), FILENAME);
+        return create(context, gson, bus, FILENAME);
+    }
+
+    public static NetworkTaskQueue create(Context context, Gson gson, Bus bus, String fileName) {
+        FileObjectQueue<NetworkTask> delegate = createFileObjectQueue(context, gson, fileName);
+        NetworkTaskQueue taskQueue = new NetworkTaskQueue(delegate, context, bus, fileName);
+        taskQueue.startServiceIfNotEmpty();
+        return taskQueue;
+    }
+
+    @SuppressWarnings("UnusedDeclaration")
+    public static NetworkTaskQueue createWithoutProcessing(Context context, Gson gson, Bus bus, String fileName) {
+        FileObjectQueue<NetworkTask> delegate = createFileObjectQueue(context, gson, fileName);
+        return new NetworkTaskQueue(delegate, context, bus, fileName);
+    }
+
+    public static FileObjectQueue<NetworkTask> createFileObjectQueue(Context context, Gson gson, String fileName) {
+        FileObjectQueue.Converter<NetworkTask> converter = new GsonConverter<>(gson);
+        File queueFile = new File(context.getFilesDir(), fileName);
         FileObjectQueue<NetworkTask> delegate;
         try {
-            delegate = new FileObjectQueue<NetworkTask>(queueFile, converter);
+            delegate = new FileObjectQueue<>(queueFile, converter);
         } catch (IOException e) {
             throw new RuntimeException("Unable to create file queue.", e);
         }
-        return new NetworkTaskQueue(delegate, context, bus);
+        return delegate;
     }
 }

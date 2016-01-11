@@ -26,26 +26,27 @@
 package edu.mit.lastmite.insight_library.fragment;
 
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
-import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 
 import java.util.ArrayList;
@@ -54,34 +55,43 @@ import java.util.List;
 import javax.inject.Inject;
 
 import edu.mit.lastmite.insight_library.R;
+import edu.mit.lastmite.insight_library.event.ClearMapEvent;
+import edu.mit.lastmite.insight_library.event.TrackEvent;
 import edu.mit.lastmite.insight_library.model.Location;
 import edu.mit.lastmite.insight_library.util.ApplicationComponent;
 import edu.mit.lastmite.insight_library.util.Helper;
 
-public class InsightMapsFragment extends DaggerFragment implements SensorEventListener {
+public class InsightMapsFragment extends BaseFragment implements SensorEventListener, GoogleMap.OnCameraChangeListener {
 
     public static final String EXTRA_FLAGS = "edu.mit.lastmite.insight_library.extra_flags";
+
+    @Inject
+    protected Helper mHelper;
 
     protected int mFlags = 0;
     protected float mAngleOffset = 0.0f;
     protected float mCurrentAngle = 0.0f;
+    protected boolean mSensorRotate = false;
 
     protected GoogleMap mGoogleMap;
 
     protected Location mLastLocation;
+    protected LatLng mMapFocus;
+    protected boolean mAutomaticFocus = true;
 
-    protected List<LatLng> mTrackingPoints;
+    protected ArrayList<LatLng> mTrackingPoints;
     protected SensorManager mSensorManager;
 
-    @Inject
-    protected Bus mBus;
-
     protected MapView mMapView;
+    protected ArrayList<Marker> mMarkers;
+    protected FloatingActionButton mLocationButton;
+    protected FloatingActionButton mRotationButton;
 
     public class Flags {
         public static final int DRAW_PATH = 1;
         public static final int DRAW_MARKER = 2;
-        public static final int ROTATE_WITH_DEVICE = 4;
+        public static final int DRAW_TRACKS = 4;
+        public static final int ROTATE_WITH_DEVICE = 8;
     }
 
     public static InsightMapsFragment newInstance(int flags) {
@@ -95,6 +105,7 @@ public class InsightMapsFragment extends DaggerFragment implements SensorEventLi
 
     @Override
     public void injectFragment(ApplicationComponent component) {
+        super.injectFragment(component);
         component.inject(this);
     }
 
@@ -102,19 +113,46 @@ public class InsightMapsFragment extends DaggerFragment implements SensorEventLi
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-        mBus.register(this);
         mFlags = getArguments().getInt(EXTRA_FLAGS);
         mSensorManager = (SensorManager) getActivity().getSystemService(Context.SENSOR_SERVICE);
         mTrackingPoints = new ArrayList<>();
+        mMarkers = new ArrayList<>();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_maps, container, false);
+        View view = inflater.inflate(R.layout.fragment_insight_maps, container, false);
 
         mMapView = (MapView) view.findViewById(R.id.maps_mapView);
         mMapView.onCreate(savedInstanceState);
         setUpMap();
+
+        mLocationButton = (FloatingActionButton) view.findViewById(R.id.locationButton);
+        if (shouldDrawPath() || shouldDrawMarker()) {
+            mLocationButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    switchLocationPolicy();
+                }
+            });
+        } else {
+            mLocationButton.setVisibility(View.GONE);
+        }
+
+        mRotationButton = (FloatingActionButton) view.findViewById(R.id.rotationButton);
+        if (shouldRotateWithDevice()) {
+            applySensorRotation();
+            mRotationButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    switchSensorRotation();
+                }
+            });
+        } else {
+            mRotationButton.setVisibility(View.GONE);
+        }
+
+        changeGestures(!mAutomaticFocus);
 
         return view;
     }
@@ -123,22 +161,12 @@ public class InsightMapsFragment extends DaggerFragment implements SensorEventLi
     public void onResume() {
         super.onResume();
         mMapView.onResume();
-        if (shouldRotateWithDevice() && mSensorManager != null) {
-            mSensorManager.registerListener(
-                    this,
-                    mSensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION),
-                    SensorManager.SENSOR_DELAY_GAME);
-        }
     }
-
 
     @Override
     public void onPause() {
         super.onPause();
         mMapView.onPause();
-        if (shouldRotateWithDevice()) {
-            mSensorManager.unregisterListener(this);
-        }
     }
 
     @Override
@@ -149,9 +177,64 @@ public class InsightMapsFragment extends DaggerFragment implements SensorEventLi
         super.onDestroy();
     }
 
+    @Override
+    public void onCameraChange(CameraPosition position) {
+        //mAutomaticFocus = false;
+    }
+
+    protected void registerSensor() {
+        mSensorManager.registerListener(
+                this,
+                mSensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION),
+                SensorManager.SENSOR_DELAY_GAME);
+    }
+
+    protected void unregisterSensor() {
+        mSensorManager.unregisterListener(this);
+    }
+
+    protected void switchSensorRotation() {
+        mSensorRotate = !mSensorRotate;
+        applySensorRotation();
+    }
+
+    protected void applySensorRotation() {
+        if (mSensorRotate) {
+            setFabDrawable();
+            registerSensor();
+            saveMapFocus();
+        } else {
+            setFabDarkenedDrawable();
+            unregisterSensor();
+        }
+    }
+
+    protected void switchLocationPolicy() {
+        //mAutomaticFocus = true;
+        mAutomaticFocus = !mAutomaticFocus;
+        changeGestures(!mAutomaticFocus);
+        centerToLastLocation();
+    }
+
+    protected void centerToLastLocation() {
+        if (mLastLocation != null) {
+            centerZoom(new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude()), 18);
+        }
+    }
+
+    protected void changeGestures(boolean enabled) {
+        mGoogleMap.getUiSettings().setAllGesturesEnabled(enabled);
+    }
+
+    protected void saveMapFocus() {
+        CameraPosition pos = mGoogleMap.getCameraPosition();
+        mMapFocus = pos.target;
+    }
+
     protected void setUpMap() {
         if (mGoogleMap == null) {
             mGoogleMap = mMapView.getMap();
+            mGoogleMap.setOnCameraChangeListener(this);
         }
     }
 
@@ -160,15 +243,19 @@ public class InsightMapsFragment extends DaggerFragment implements SensorEventLi
      */
 
     protected boolean shouldRotateWithDevice() {
-        return Helper.get(getContext()).isFlagActivated(mFlags, Flags.ROTATE_WITH_DEVICE);
+        return mHelper.isFlagActivated(mFlags, Flags.ROTATE_WITH_DEVICE);
     }
 
     protected boolean shouldDrawMarker() {
-        return Helper.get(getContext()).isFlagActivated(mFlags, Flags.DRAW_MARKER);
+        return mHelper.isFlagActivated(mFlags, Flags.DRAW_MARKER);
     }
 
     protected boolean shouldDrawPath() {
-        return Helper.get(getContext()).isFlagActivated(mFlags, Flags.DRAW_PATH);
+        return mHelper.isFlagActivated(mFlags, Flags.DRAW_PATH);
+    }
+
+    protected boolean shouldDrawTracks() {
+        return mHelper.isFlagActivated(mFlags, Flags.DRAW_TRACKS);
     }
 
 
@@ -187,7 +274,10 @@ public class InsightMapsFragment extends DaggerFragment implements SensorEventLi
     protected void updateCamera(float bearing) {
         if (mLastLocation != null) {
             CameraPosition oldPos = mGoogleMap.getCameraPosition();
-            CameraPosition pos = CameraPosition.builder(oldPos).bearing(bearing).target(new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude())).build();
+            CameraPosition pos = CameraPosition.builder(oldPos)
+                    .bearing(bearing)
+                    .target(mMapFocus)
+                    .build();
             mGoogleMap.moveCamera(CameraUpdateFactory.newCameraPosition(pos));
         }
     }
@@ -197,12 +287,20 @@ public class InsightMapsFragment extends DaggerFragment implements SensorEventLi
 
     }
 
+    @SuppressWarnings("UnusedDeclaration")
     @Subscribe
     public void onLocationEvent(Location location) {
         mLastLocation = location;
 
+        if (shouldDrawMarker() || shouldDrawPath()) {
+            clearMap();
+        }
+
         if (shouldDrawMarker()) {
             addMarkerToMap(location.getLatitude(), location.getLongitude());
+            if (mAutomaticFocus) {
+                centerToLastLocation();
+            }
         }
 
         if (shouldDrawPath()) {
@@ -210,17 +308,68 @@ public class InsightMapsFragment extends DaggerFragment implements SensorEventLi
         }
     }
 
+    @SuppressWarnings("UnusedDeclaration")
+    @Subscribe
+    public void onTrackEvent(TrackEvent trackEvent) {
+        if (shouldDrawTracks()) {
+            clearMap();
+            List<LatLng> locations = trackEvent.getLocations();
+            if (locations.size() > 0) {
+                addMarkerToMap(locations.get(0));
+                addMarkerToMap(locations.get(locations.size() - 1));
+                resizeToMarkers(mMarkers);
+                drawPathFromLatLngs(trackEvent.getLocations());
+            }
+        }
+    }
+
+    @SuppressWarnings("UnusedDeclaration")
+    @Subscribe
+    public void onClearMapEvent(ClearMapEvent event) {
+        clearMap();
+    }
+
+    /* Views */
+    protected void setFabDrawable() {
+        Drawable drawable = getResources().getDrawable(R.mipmap.ic_compass);
+        drawable.setAlpha(255);
+        mRotationButton.setImageDrawable(drawable);
+    }
+
+    protected void setFabDarkenedDrawable() {
+        mRotationButton.setImageDrawable(getDarkenedDrawable(R.mipmap.ic_compass));
+    }
+
+    protected Drawable getDarkenedDrawable(int id) {
+        Drawable drawable = getResources().getDrawable(id);
+        drawable.setAlpha(200);
+        return drawable;
+    }
+
     protected void removeMarker() {
         mGoogleMap.clear();
     }
 
     protected void addMarkerToMap(double latitude, double longitude) {
-        mTrackingPoints.add(new LatLng(latitude, longitude));
+        addMarkerToMap(new LatLng(latitude, longitude));
+    }
+
+    protected void addMarkerToMap(LatLng latLng) {
+        mTrackingPoints.add(latLng);
         removeMarker();
 
-        MarkerOptions options = new MarkerOptions().position(new LatLng(latitude, longitude));
-        mGoogleMap.addMarker(options);
-        centerZoom(new LatLng(latitude, longitude), 18);
+        MarkerOptions options = new MarkerOptions().position(latLng);
+        mMarkers.add(mGoogleMap.addMarker(options));
+    }
+
+    protected void resizeToMarkers(ArrayList<Marker> markers) {
+        if (markers.size() == 0) return;
+        LatLngBounds.Builder builder = new LatLngBounds.Builder();
+        for (Marker marker : markers) {
+            builder.include(marker.getPosition());
+        }
+        CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(builder.build(), mHelper.dpToPx(10));
+        mGoogleMap.animateCamera(cu);
     }
 
     protected void centerZoom(LatLng latLng, int zoom) {
@@ -231,9 +380,17 @@ public class InsightMapsFragment extends DaggerFragment implements SensorEventLi
     }
 
     protected void drawPath() {
+        drawPathFromLatLngs(mTrackingPoints);
+    }
+
+    protected void drawPathFromLatLngs(ArrayList<LatLng> latLngs) {
         mGoogleMap.addPolyline(new PolylineOptions()
-                .addAll(mTrackingPoints)
-                .width(4)
+                .addAll(latLngs)
+                .width(5)
                 .color(getResources().getColor(R.color.colorAccent)));
+    }
+
+    protected void clearMap() {
+        mGoogleMap.clear();
     }
 }

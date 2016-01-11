@@ -29,11 +29,9 @@ package edu.mit.lastmite.insight_library.communication;
 import android.content.Intent;
 
 public interface TargetListener {
-
     int RESULT_OK = 0;
     int RESULT_CANCELED = 1;
     int RESULT_SKIPPED = 2;
 
     void onResult(int requestCode, int resultCode, Intent data);
-
 }

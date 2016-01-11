@@ -4,4 +4,19 @@
     <!-- Loading -->
     <string name="loading_title">Loading...</string>
     <string name="loading_content">Loading...</string>
+
+    <string name="started">Started:</string>
+    <string name="latitude">Latitude:</string>
+    <string name="longitude">Longitude:</string>
+    <string name="altitude">Altitude:</string>
+    <string name="elapsed_time">Elapsed Time:</string>
+    <string name="start">Start</string>
+    <string name="stop">Stop</string>
+    <string name="gps_enabled">GPS Enabled</string>
+    <string name="gps_disabled">GPS Disabled</string>
+    <string name="cell_text">Run at %1$s</string>
+
+    <!-- Tracking -->
+    <string name="track_distance_placeholder">0.00 km</string>
+    <string name="track_speed_placeholder">0.00 kph</string>
 </resources>

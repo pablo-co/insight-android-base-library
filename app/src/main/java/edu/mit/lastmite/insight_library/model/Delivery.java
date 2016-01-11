@@ -36,26 +36,38 @@ public class Delivery implements JSONable {
 
     public static final String JSON_WRAPPER = "delivery";
     public static final String JSON_ID = "id_delivery";
-    public static final String JSON_START_TIME = "start_time";
-    public static final String JSON_END_TIME = "end_time";
+    public static final String JSON_TYPE = "type";
+    public static final String JSON_TIME = "time";
+    public static final String JSON_EQUIPMENT = "equipment";
+    public static final String JSON_BEYOND_SEGMENT = "beyond_segment";
     public static final String JSON_LATITUDE = "lat";
     public static final String JSON_LONGITUDE = "lng";
+    public static final String JSON_ORDER_ID = "order_id";
+    public static final String JSON_VISIT_ID = "visit_id";
     public static final String JSON_ROUTE_ID = "route_id";
 
     protected Long mId;
-    protected Long mStartTime;
-    protected Long mEndTime;
+    protected Integer mType;
+    protected Boolean mEquipment;
+    protected Boolean mBeyondSegment;
+    protected Long mTime;
     protected Double mLatitude;
     protected Double mLongitude;
+    protected Long mOrderId;
+    protected Long mVisitId;
     protected Long mRouteId;
 
     public Delivery() {
         mId = null;
-        mStartTime = null;
-        mEndTime = null;
+        mType = null;
+        mEquipment = null;
+        mBeyondSegment = null;
+        mTime = null;
         mLatitude = null;
         mLongitude = null;
+        mOrderId = null;
         mRouteId = null;
+        mVisitId = null;
         measureTime();
     }
 
@@ -64,7 +76,15 @@ public class Delivery implements JSONable {
         mId = object.getLong(JSON_ID);
         mLatitude = object.getDouble(JSON_LATITUDE);
         mLongitude = object.getDouble(JSON_LONGITUDE);
-        mRouteId =  object.getLong(JSON_ROUTE_ID);
+        mType = object.getInt(JSON_TYPE);
+        mEquipment = object.getBoolean(JSON_EQUIPMENT);
+        mBeyondSegment = object.getBoolean(JSON_BEYOND_SEGMENT);
+        mTime = object.getLong(JSON_TIME);
+        if (object.has(JSON_ORDER_ID)) {
+            mOrderId = object.getLong(JSON_ORDER_ID);
+        }
+        mVisitId = object.getLong(JSON_VISIT_ID);
+        mRouteId = object.getLong(JSON_ROUTE_ID);
         measureTime();
     }
 
@@ -76,20 +96,52 @@ public class Delivery implements JSONable {
         mId = id;
     }
 
-    public Long getStartTime() {
-        return mStartTime;
+    public Integer getType() {
+        return mType;
     }
 
-    public void setStartTime(Long startTime) {
-        mStartTime = startTime;
+    public void setType(Integer type) {
+        mType = type;
     }
 
-    public Long getEndTime() {
-        return mEndTime;
+    public Boolean getEquipment() {
+        return mEquipment;
     }
 
-    public void setEndTime(Long endTime) {
-        mEndTime = endTime;
+    public void setEquipment(Boolean equipment) {
+        mEquipment = equipment;
+    }
+
+    public Boolean getBeyondSegment() {
+        return mBeyondSegment;
+    }
+
+    public void setBeyondSegment(Boolean beyondSegment) {
+        mBeyondSegment = beyondSegment;
+    }
+
+    public Long getOrderId() {
+        return mOrderId;
+    }
+
+    public void setOrderId(Long orderId) {
+        mOrderId = orderId;
+    }
+
+    public Long getTime() {
+        return mTime;
+    }
+
+    public void setTime(Long time) {
+        mTime = time;
+    }
+
+    public Long getVisitId() {
+        return mVisitId;
+    }
+
+    public void setVisitId(Long visitId) {
+        mVisitId = visitId;
     }
 
     public Double getLatitude() {
@@ -122,20 +174,21 @@ public class Delivery implements JSONable {
 
 
     public void measureTime() {
-        if (mStartTime == null) {
-            mStartTime = System.currentTimeMillis();
-        }
-
-        if (mEndTime == null) {
-            mEndTime = System.currentTimeMillis();
+        if (mTime == null) {
+            mTime = System.currentTimeMillis();
         }
     }
 
     public JSONObject toJSONWithoutWrapper() throws JSONException {
         JSONObject object = new JSONObject();
         object.put(JSON_ID, mId);
-        object.put(JSON_START_TIME, mStartTime);
-        object.put(JSON_END_TIME, mEndTime);
+        object.put(JSON_TIME, mTime);
+        object.put(JSON_LATITUDE, mLatitude);
+        object.put(JSON_LONGITUDE, mLongitude);
+        object.put(JSON_BEYOND_SEGMENT, mBeyondSegment);
+        object.put(JSON_EQUIPMENT, mEquipment);
+        object.put(JSON_TYPE, mType);
+        object.put(JSON_VISIT_ID, mVisitId);
         object.put(JSON_ROUTE_ID, mRouteId);
         return object;
     }
@@ -149,8 +202,13 @@ public class Delivery implements JSONable {
     public HashMap<String, Object> toHashMap() {
         HashMap<String, Object> object = new HashMap<>();
         object.put(JSON_ID, mId);
-        object.put(JSON_START_TIME, mStartTime);
-        object.put(JSON_END_TIME, mEndTime);
+        object.put(JSON_TIME, mTime);
+        object.put(JSON_LATITUDE, mLatitude);
+        object.put(JSON_LONGITUDE, mLongitude);
+        object.put(JSON_BEYOND_SEGMENT, mBeyondSegment);
+        object.put(JSON_EQUIPMENT, mEquipment);
+        object.put(JSON_TYPE, mType);
+        object.put(JSON_VISIT_ID, mVisitId);
         object.put(JSON_ROUTE_ID, mRouteId);
         return object;
     }
@@ -158,13 +216,17 @@ public class Delivery implements JSONable {
     public RequestParams buildParams() {
         HashMap<String, Object> object = toHashMap();
         object.put(JSON_ID, mId);
-        object.put(JSON_START_TIME, mStartTime);
-        object.put(JSON_END_TIME, mEndTime);
+        object.put(JSON_TIME, mTime);
+        object.put(JSON_LATITUDE, mLatitude);
+        object.put(JSON_LONGITUDE, mLongitude);
+        object.put(JSON_BEYOND_SEGMENT, mBeyondSegment);
+        object.put(JSON_EQUIPMENT, mEquipment);
+        object.put(JSON_TYPE, mType);
+        object.put(JSON_VISIT_ID, mVisitId);
         object.put(JSON_ROUTE_ID, mRouteId);
 
         RequestParams params = new RequestParams();
         params.put(JSON_WRAPPER, object);
         return params;
     }
-
 }

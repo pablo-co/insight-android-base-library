@@ -70,16 +70,14 @@ public class APIResponseHandler extends JsonHttpResponseHandler {
 
     @Override
     public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
-        //Log.i(TAG, "State code: " + statusCode + ", response: " + errorResponse.toString());
         ErrorHandler.handleError(mFragmentManager, statusCode, errorResponse);
-        onFinish(true);
+        onFinish(false);
     }
 
     @Override
     public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
-        //Log.i(TAG, "State code: " + statusCode + ", response: " + responseString);
         ErrorHandler.handleError(mFragmentManager, statusCode, responseString);
-        onFinish(true);
+        onFinish(false);
     }
 
     public void onFinish(boolean success) {
