@@ -86,9 +86,7 @@ public class ErrorHandler {
                     e.printStackTrace();
                 }
             }
-        } else if (statusCode == 0) {
-            handleError(fragmentManager, statusCode, "No se pudo contactar al servidor. Intente más tarde.");
-        } else {
+        } else if (statusCode != 0) {
             handleError(fragmentManager, statusCode, "Hubo un error desconocido en el servidor.");
         }
         Log.e(TAG, "Error doing request: status: " + statusCode + ", response: " + errorResponse);

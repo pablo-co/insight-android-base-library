@@ -38,25 +38,31 @@ public class Route implements JSONable {
     public static final String JSON_ID = "id_route";
     public static final String JSON_START_TIME = "start_time";
     public static final String JSON_END_TIME = "end_time";
+    public static final String JSON_LOADING_DURATION = "duration";
     public static final String JSON_VEHICLE_ID = "vehicle_id";
 
     protected Long mId;
     protected Long mStartTime;
     protected Long mEndTime;
+    protected Long mLoadingDuration;
     protected Long mVehicleId;
 
     public Route() {
         mId = null;
         mStartTime = null;
         mEndTime = null;
+        mLoadingDuration = null;
         mVehicleId = null;
         measureTime();
     }
 
     public Route(JSONObject json) throws JSONException {
-        JSONObject object = json.getJSONObject(JSON_WRAPPER);
+        JSONObject object = json;
+        if (json.has(JSON_WRAPPER)) {
+            object = json.getJSONObject(JSON_WRAPPER);
+        }
         mId = object.getLong(JSON_ID);
-        mVehicleId=  object.getLong(JSON_VEHICLE_ID);
+        mVehicleId = object.getLong(JSON_VEHICLE_ID);
         measureTime();
     }
 
@@ -82,6 +88,14 @@ public class Route implements JSONable {
 
     public void setEndTime(Long endTime) {
         mEndTime = endTime;
+    }
+
+    public Long getLoadingDuration() {
+        return mLoadingDuration;
+    }
+
+    public void setLoadingDuration(Long loadingDuration) {
+        mLoadingDuration = loadingDuration;
     }
 
     public Long getVehicleId() {
@@ -112,6 +126,7 @@ public class Route implements JSONable {
         object.put(JSON_ID, mId);
         object.put(JSON_START_TIME, mStartTime);
         object.put(JSON_END_TIME, mEndTime);
+        object.put(JSON_LOADING_DURATION, mLoadingDuration);
         object.put(JSON_VEHICLE_ID, mVehicleId);
         return object;
     }
@@ -127,6 +142,7 @@ public class Route implements JSONable {
         object.put(JSON_ID, mId);
         object.put(JSON_START_TIME, mStartTime);
         object.put(JSON_END_TIME, mEndTime);
+        object.put(JSON_LOADING_DURATION, mLoadingDuration);
         object.put(JSON_VEHICLE_ID, mVehicleId);
         return object;
     }
@@ -136,6 +152,7 @@ public class Route implements JSONable {
         object.put(JSON_ID, mId);
         object.put(JSON_START_TIME, mStartTime);
         object.put(JSON_END_TIME, mEndTime);
+        object.put(JSON_LOADING_DURATION, mLoadingDuration);
         object.put(JSON_VEHICLE_ID, mVehicleId);
 
         RequestParams params = new RequestParams();
