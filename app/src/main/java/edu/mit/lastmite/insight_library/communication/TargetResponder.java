@@ -27,10 +27,15 @@ package edu.mit.lastmite.insight_library.communication;
 
 
 public interface TargetResponder {
-
+    @SuppressWarnings("UnusedDeclaration")
     int getRequestCode();
+
+    @SuppressWarnings("UnusedDeclaration")
     void setRequestCode(int requestCode);
 
+    @SuppressWarnings("UnusedDeclaration")
     TargetListener getTargetListener();
+
+    @SuppressWarnings("UnusedDeclaration")
     void setTargetListener(TargetListener targetListener, int requestCode);
 }

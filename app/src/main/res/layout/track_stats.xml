@@ -71,14 +71,17 @@
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"/>
+                android:layout_gravity="center_vertical"
+                android:src="@mipmap/ic_clock"/>
 
             <com.rey.material.widget.TextView
+                android:id="@+id/track_completeTimeTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:layout_marginLeft="16dp"
                 android:layout_weight="1"
+                android:text="00:00"
                 android:textAppearance="?android:attr/textAppearanceLarge"
                 android:textColor="@android:color/white"/>
 

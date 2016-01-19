@@ -36,7 +36,6 @@ import org.json.JSONObject;
 import java.util.HashMap;
 
 public class User implements JSONable, Parcelable {
-
     public static final String JSON_WRAPPER = "crew";
     public static final String JSON_ID = "id_crew";
     public static final String JSON_ACCESS_TOKEN = "access_token";

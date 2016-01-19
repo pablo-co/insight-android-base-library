@@ -33,7 +33,6 @@ import org.json.JSONObject;
 import java.util.HashMap;
 
 public class Session implements JSONable {
-
     public static final String JSON_WRAPPER = "session";
     public static final String JSON_PLATFORM = "platform";
     public static final String JSON_PUSH_ID = "push_id";

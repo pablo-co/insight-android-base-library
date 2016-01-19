@@ -31,7 +31,7 @@ import edu.mit.lastmite.insight_library.BaseLibrary;
 import edu.mit.lastmite.insight_library.util.ApplicationComponent;
 
 
-public abstract class DaggerService extends Service {
+public abstract class DaggerService extends DaggerIntentService {
 
     @Override
     public void onCreate() {

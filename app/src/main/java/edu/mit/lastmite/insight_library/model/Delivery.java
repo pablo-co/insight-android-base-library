@@ -33,7 +33,6 @@ import org.json.JSONObject;
 import java.util.HashMap;
 
 public class Delivery implements JSONable {
-
     public static final String JSON_WRAPPER = "delivery";
     public static final String JSON_ID = "id_delivery";
     public static final String JSON_TYPE = "type";

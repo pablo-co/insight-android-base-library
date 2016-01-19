@@ -23,12 +23,17 @@
 package edu.mit.lastmite.insight_library.activity;
 
 import android.content.Intent;
+import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.NavUtils;
 import android.support.v4.app.TaskStackBuilder;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 
 import javax.inject.Inject;
 
@@ -40,6 +45,9 @@ import edu.mit.lastmite.insight_library.util.Helper;
 public abstract class SingleFragmentActivity extends DaggerActivity {
 
     private static final String TAG = "SingleFragmentActivity";
+
+
+    public static final float STATUS_BAR_COLOR_RATE = 0.75f;
 
     /**
      * Should inflate view during the {AppCompatActivity#onCreate}
@@ -92,14 +100,17 @@ public abstract class SingleFragmentActivity extends DaggerActivity {
         }
     }
 
+    @SuppressWarnings("UnusedDeclaration")
     protected void inflateFragment(int resourceId, Helper.FragmentCreator creator, int inAnimation, int outAnimation) {
         mHelper.inflateFragment(getSupportFragmentManager(), resourceId, creator, inAnimation, outAnimation);
     }
 
+    @SuppressWarnings("UnusedDeclaration")
     protected void inflateFragment(int resourceId, Helper.FragmentCreator creator, int inAnimation, int outAnimation, boolean backStack) {
         mHelper.inflateFragment(getSupportFragmentManager(), resourceId, creator, inAnimation, outAnimation, backStack);
     }
 
+    @SuppressWarnings("UnusedDeclaration")
     protected void removeFragment(int resourceId) {
         mHelper.removeFragment(getSupportFragmentManager(), resourceId);
     }
@@ -113,6 +124,32 @@ public abstract class SingleFragmentActivity extends DaggerActivity {
                     .startActivities();
         } else {
             finish();
+        }
+    }
+
+    @SuppressWarnings("UnusedDeclaration")
+    public View getActionBarView() {
+        Window window = getWindow();
+        View view = window.getDecorView();
+        int resId = getResources().getIdentifier("action_bar_container", "id", getPackageName());
+        return view.findViewById(resId);
+    }
+
+    @SuppressWarnings("UnusedDeclaration")
+    public void setDarkenedStatusBarColor(int color) {
+        int r = Color.red(color);
+        int b = Color.blue(color);
+        int g = Color.green(color);
+        int darkerColor = Color.rgb((int) (r * STATUS_BAR_COLOR_RATE), (int) (g * STATUS_BAR_COLOR_RATE), (int) (b * STATUS_BAR_COLOR_RATE));
+        setStatusBarColor(darkerColor);
+    }
+
+    @SuppressWarnings("UnusedDeclaration")
+    public void setStatusBarColor(int color) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            Window window = getWindow();
+            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            window.setStatusBarColor(color);
         }
     }
 

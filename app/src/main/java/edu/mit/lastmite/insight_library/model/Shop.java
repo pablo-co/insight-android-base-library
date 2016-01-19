@@ -171,11 +171,17 @@ public class Shop implements JSONable {
         mDistance = distance;
     }
 
-    public JSONObject toJSON() throws JSONException {
+    public JSONObject toJSONWithoutWrapper() throws JSONException {
         JSONObject object = new JSONObject();
         object.put(JSON_LATITUDE, mLatitude);
         object.put(JSON_LONGITUDE, mLongitude);
         return object;
+    }
+
+    public JSONObject toJSON() throws JSONException {
+        JSONObject wrapper = new JSONObject();
+        wrapper.put(JSON_WRAPPER, toJSONWithoutWrapper());
+        return wrapper;
     }
 
     public RequestParams buildParams() {

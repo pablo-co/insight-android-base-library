@@ -20,7 +20,7 @@
 
 <resources>
     <string name="secret_keys">secret_keys</string>
-    <string name="domain"></string>
+    <string name="base_url"></string>
     <string name="end_point"></string>
 
 </resources>

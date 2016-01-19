@@ -43,6 +43,12 @@ dependencies {
 
     /* Views */
     compile 'com.github.rey5137:material:1.2.2'
+    compile 'com.squareup.picasso:picasso:2.3.3'
+    compile 'com.sothree.slidinguppanel:library:3.2.1'
+
+    /* Save Instance State */
+    compile 'frankiesardo:icepick:3.1.0'
+    provided 'frankiesardo:icepick-processor:3.1.0'
 
     /* Dependency injection*/
     compile 'com.google.dagger:dagger:2.0.2'

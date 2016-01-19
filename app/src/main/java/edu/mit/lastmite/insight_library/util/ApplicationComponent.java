@@ -10,6 +10,7 @@ import edu.mit.lastmite.insight_library.fragment.BaseFragment;
 import edu.mit.lastmite.insight_library.fragment.InsightMapsFragment;
 import edu.mit.lastmite.insight_library.fragment.TrackFragment;
 import edu.mit.lastmite.insight_library.service.NetworkQueueService;
+import edu.mit.lastmite.insight_library.service.TimerService;
 import edu.mit.lastmite.insight_library.task.NetworkTask;
 
 @Singleton
@@ -20,6 +21,8 @@ public interface ApplicationComponent {
     void inject(SingleFragmentActivity activity);
 
     void inject(NetworkQueueService service);
+
+    void inject(TimerService service);
 
     void inject(BaseFragment fragment);
 

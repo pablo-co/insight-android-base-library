@@ -33,22 +33,37 @@ import org.json.JSONObject;
 import java.util.HashMap;
 
 public class Route implements JSONable {
-
     public static final String JSON_WRAPPER = "route";
     public static final String JSON_ID = "id_route";
     public static final String JSON_START_TIME = "start_time";
     public static final String JSON_END_TIME = "end_time";
-    public static final String JSON_LOADING_DURATION = "duration";
+    public static final String JSON_LATITUDE = "lat";
+    public static final String JSON_LONGITUDE = "lng";
+    public static final String JSON_TYPE = "route_type";
+    public static final String JSON_LOADING_DURATION = "loading_duration";
     public static final String JSON_VEHICLE_ID = "vehicle_id";
+
+    public static class Type {
+        public static final int GROUP_VEHICLE = 1;
+        public static final int CREW = 2;
+        public static final int INDIVIDUAL_VEHICLE = 3;
+        public static final int PEDESTRIAN = 4;
+    }
 
     protected Long mId;
     protected Long mStartTime;
     protected Long mEndTime;
+    protected Double mLatitude;
+    protected Double mLongitude;
+    protected Integer mType;
     protected Long mLoadingDuration;
     protected Long mVehicleId;
 
     public Route() {
         mId = null;
+        mLatitude = null;
+        mLongitude = null;
+        mType = Type.GROUP_VEHICLE;
         mStartTime = null;
         mEndTime = null;
         mLoadingDuration = null;
@@ -62,7 +77,18 @@ public class Route implements JSONable {
             object = json.getJSONObject(JSON_WRAPPER);
         }
         mId = object.getLong(JSON_ID);
-        mVehicleId = object.getLong(JSON_VEHICLE_ID);
+
+        if (object.has(JSON_VEHICLE_ID)) {
+            mVehicleId = object.getLong(JSON_VEHICLE_ID);
+        }
+
+        if (object.has(JSON_LATITUDE)) {
+            mLatitude = object.getDouble(JSON_LATITUDE);
+        }
+
+        if (object.has(JSON_LONGITUDE)) {
+            mLongitude = object.getDouble(JSON_LONGITUDE);
+        }
         measureTime();
     }
 
@@ -72,6 +98,22 @@ public class Route implements JSONable {
 
     public void setId(Long id) {
         mId = id;
+    }
+
+    public Double getLatitude() {
+        return mLatitude;
+    }
+
+    public void setLatitude(Double latitude) {
+        mLatitude = latitude;
+    }
+
+    public Double getLongitude() {
+        return mLongitude;
+    }
+
+    public void setLongitude(Double longitude) {
+        mLongitude = longitude;
     }
 
     public Long getStartTime() {
@@ -106,6 +148,18 @@ public class Route implements JSONable {
         mVehicleId = vehicleId;
     }
 
+    public Integer getType() {
+        return mType;
+    }
+
+    public void setType(Integer type) {
+        mType = type;
+    }
+
+    public boolean isLoadingType(Integer loadingType) {
+        return loadingType == mType;
+    }
+
     public boolean isEmpty() {
         return mId == null;
     }
@@ -128,6 +182,9 @@ public class Route implements JSONable {
         object.put(JSON_END_TIME, mEndTime);
         object.put(JSON_LOADING_DURATION, mLoadingDuration);
         object.put(JSON_VEHICLE_ID, mVehicleId);
+        object.put(JSON_TYPE, mType);
+        object.put(JSON_LATITUDE, mLatitude);
+        object.put(JSON_LONGITUDE, mLongitude);
         return object;
     }
 
@@ -144,6 +201,9 @@ public class Route implements JSONable {
         object.put(JSON_END_TIME, mEndTime);
         object.put(JSON_LOADING_DURATION, mLoadingDuration);
         object.put(JSON_VEHICLE_ID, mVehicleId);
+        object.put(JSON_TYPE, mType);
+        object.put(JSON_LATITUDE, mLatitude);
+        object.put(JSON_LONGITUDE, mLongitude);
         return object;
     }
 
@@ -153,11 +213,13 @@ public class Route implements JSONable {
         object.put(JSON_START_TIME, mStartTime);
         object.put(JSON_END_TIME, mEndTime);
         object.put(JSON_LOADING_DURATION, mLoadingDuration);
+        object.put(JSON_TYPE, mType);
         object.put(JSON_VEHICLE_ID, mVehicleId);
+        object.put(JSON_LATITUDE, mLatitude);
+        object.put(JSON_LONGITUDE, mLongitude);
 
         RequestParams params = new RequestParams();
         params.put(JSON_WRAPPER, object);
         return params;
     }
-
 }

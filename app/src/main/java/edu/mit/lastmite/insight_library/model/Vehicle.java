@@ -33,19 +33,18 @@ import org.json.JSONObject;
 import java.util.HashMap;
 
 public class Vehicle implements JSONable {
-
     public static final String JSON_WRAPPER = "vehicle";
     public static final String JSON_ID = "id_vehicle";
-    public static final String JSON_PLATES = "plates";
+    public static final String JSON_IDENTIFIER = "identifier";
     public static final String JSON_PASSWORD = "password";
 
     protected Long mId;
-    protected String mPlates;
+    protected String mIdentifier;
     protected String mPassword;
 
     public Vehicle() {
         mId = null;
-        mPlates = null;
+        mIdentifier = null;
         mPassword = null;
     }
 
@@ -56,7 +55,7 @@ public class Vehicle implements JSONable {
         }
 
         mId = object.getLong(JSON_ID);
-        mPlates = object.getString(JSON_PLATES);
+        mIdentifier = object.getString(JSON_IDENTIFIER);
     }
 
     public Long getId() {
@@ -67,12 +66,12 @@ public class Vehicle implements JSONable {
         mId = id;
     }
 
-    public String getPlates() {
-        return mPlates;
+    public String getIdentifier() {
+        return mIdentifier;
     }
 
-    public void setPlates(String plates) {
-        mPlates = plates;
+    public void setIdentifier(String identifier) {
+        mIdentifier = identifier;
     }
 
     public String getPassword() {
@@ -90,7 +89,7 @@ public class Vehicle implements JSONable {
     public JSONObject toJSONWithoutWrapper() throws JSONException {
         JSONObject object = new JSONObject();
         object.put(JSON_ID, mId);
-        object.put(JSON_PLATES, mPlates);
+        object.put(JSON_IDENTIFIER, mIdentifier);
         object.put(JSON_PASSWORD, mPassword);
         return object;
     }
@@ -104,14 +103,14 @@ public class Vehicle implements JSONable {
     public HashMap<String, Object> toHashMap() {
         HashMap<String, Object> object = new HashMap<>();
         object.put(JSON_ID, mId);
-        object.put(JSON_PLATES, mPlates);
+        object.put(JSON_IDENTIFIER, mIdentifier);
         object.put(JSON_PASSWORD, mPassword);
         return object;
     }
 
     public RequestParams buildParams() {
         HashMap<String, Object> object = toHashMap();
-        object.put(JSON_PLATES, mPlates);
+        object.put(JSON_IDENTIFIER, mIdentifier);
         object.put(JSON_PASSWORD, mPassword);
 
         RequestParams params = new RequestParams();

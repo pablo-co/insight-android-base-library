@@ -53,7 +53,7 @@ public class APIFetch {
 
     public APIFetch(Context context) {
         mContext = context;
-        mDomainName = context.getString(R.string.domain);
+        mDomainName = context.getString(R.string.base_url);
         mEndpoint = context.getString(R.string.end_point);
     }
 

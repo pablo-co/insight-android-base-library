@@ -33,7 +33,6 @@ import org.json.JSONObject;
 import java.util.HashMap;
 
 public class Parking implements JSONable {
-
     public static final String JSON_WRAPPER = "parking";
     public static final String JSON_ID = "id_parking";
     public static final String JSON_START_TIME = "start_time";

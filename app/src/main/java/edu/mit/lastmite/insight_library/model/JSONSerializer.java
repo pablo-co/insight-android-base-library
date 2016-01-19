@@ -45,12 +45,13 @@ import java.io.Writer;
 import java.lang.reflect.Constructor;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
+import java.util.List;
 
 import edu.mit.lastmite.insight_library.R;
 import edu.mit.lastmite.insight_library.security.AesCbcWithIntegrity;
 
 
-public class JSONSerializer {
+public class JSONSerializer<T extends JSONable> {
 
     private Context mContext;
     private String mFilename;
@@ -86,8 +87,8 @@ public class JSONSerializer {
         return constructor.newInstance(object);
     }
 
-    public ArrayList<?> loadArray(String className) throws Exception {
-        ArrayList<Object> objects = new ArrayList<>();
+    public ArrayList<T> loadArray(String className) throws Exception {
+        ArrayList<T> objects = new ArrayList<>();
 
         Class cls = Class.forName(className);
         Constructor<?> constructor = cls.getConstructor(JSONObject.class);
@@ -95,13 +96,13 @@ public class JSONSerializer {
         JSONArray array = (JSONArray) new JSONTokener(AesCbcWithIntegrity.decryptString(new AesCbcWithIntegrity.CipherTextIvMac(readJSONString()), mSecretKeys)).nextValue();
 
         for (int i = 0; i < array.length(); ++i) {
-            objects.add(constructor.newInstance(array.getJSONObject(i)));
+            objects.add((T) constructor.newInstance(array.getJSONObject(i)));
         }
 
         return objects;
     }
 
-    public void saveArray(ArrayList<JSONable> objects) throws JSONException, IOException, GeneralSecurityException {
+    public void saveArray(List<T> objects) throws JSONException, IOException, GeneralSecurityException {
         JSONArray array = new JSONArray();
         for (JSONable o : objects) {
             array.put(o.toJSON());

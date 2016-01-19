@@ -44,6 +44,26 @@ public class Storage {
     }
 
     @SuppressWarnings("UnusedDeclaration")
+    public Integer getGlobalInteger(String key) {
+        return getSharedPreferences().getInt(key, -1);
+    }
+
+    @SuppressWarnings("UnusedDeclaration")
+    public Integer getLocalInteger(String queueName, String key) {
+        return getSharedPreferences().getInt(getLocalKey(queueName, key), -1);
+    }
+
+    @SuppressWarnings("UnusedDeclaration")
+    public void putGlobalInteger(String key, Integer value) {
+        getSharedPreferences().edit().putInt(key, value).apply();
+    }
+
+    @SuppressWarnings("UnusedDeclaration")
+    public void putLocalInteger(String queueName, String key, Integer value) {
+        getSharedPreferences().edit().putInt(getLocalKey(queueName, key), value).apply();
+    }
+
+    @SuppressWarnings("UnusedDeclaration")
     public long getGlobalLong(String key) {
         return getSharedPreferences().getLong(key, -1);
     }
@@ -71,5 +91,10 @@ public class Storage {
     @SuppressWarnings("UnusedDeclaration")
     public String getLocalString(String queueName, String key) {
         return getSharedPreferences().getString(getLocalKey(queueName, key), null);
+    }
+
+    @SuppressWarnings("UnusedDeclaration")
+    public void clear() {
+        getSharedPreferences().edit().clear().apply();
     }
 }
