@@ -16,13 +16,17 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.preference.RingtonePreference;
+import android.support.v4.app.NavUtils;
+import android.support.v4.app.TaskStackBuilder;
 import android.support.v7.app.ActionBar;
 import android.text.TextUtils;
 import android.view.MenuItem;
+import android.view.View;
 
 import java.util.List;
 
 import edu.mit.lastmite.insight_library.R;
+import edu.mit.lastmite.insight_library.util.ViewUtils;
 
 /**
  * A {@link PreferenceActivity} that presents a set of application settings. On
@@ -120,11 +124,43 @@ public abstract class BaseSettingsActivity extends AppCompatPreferenceActivity {
         return isXLargeTablet(this);
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                onHomePressed();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
     /**
      * This method stops fragment injection in malicious applications.
      * Make sure to deny any unknown fragments here.
      */
     protected boolean isValidFragment(String fragmentName) {
         return PreferenceFragment.class.getName().equals(fragmentName);
+    }
+
+    protected void onHomePressed() {
+        Intent upIntent = NavUtils.getParentActivityIntent(this);
+        if (upIntent != null && NavUtils.shouldUpRecreateTask(this, upIntent)) {
+            TaskStackBuilder
+                    .create(this)
+                    .addNextIntentWithParentStack(upIntent)
+                    .startActivities();
+        } else {
+            finish();
+        }
+    }
+
+    public void setDarkenedStatusBarColor(int color) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            getWindow().setStatusBarColor(ViewUtils.getDarkenedColor(color));
+        }
+    }
+
+    public View getActionBarView() {
+        return ViewUtils.getActionBarView(this);
     }
 }

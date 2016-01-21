@@ -4,15 +4,13 @@ import android.animation.ArgbEvaluator;
 import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
 import android.content.res.Configuration;
-import android.media.Image;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.CountDownTimer;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.view.Choreographer;
-import android.view.Surface;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
@@ -20,9 +18,11 @@ import android.view.animation.DecelerateInterpolator;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TableLayout;
 import android.widget.TextView;
 
+import com.github.clans.fab.Label;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
@@ -31,6 +31,8 @@ import com.squareup.picasso.Picasso;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.ArrayList;
+import java.util.Iterator;
 
 import javax.inject.Inject;
 
@@ -42,6 +44,7 @@ import edu.mit.lastmite.insight_library.model.Location;
 import edu.mit.lastmite.insight_library.util.ApplicationComponent;
 import edu.mit.lastmite.insight_library.util.ColorTransformation;
 import edu.mit.lastmite.insight_library.util.Helper;
+import edu.mit.lastmite.insight_library.util.StringUtils;
 import icepick.Icepick;
 
 public class TrackFragment extends FragmentResponder {
@@ -55,14 +58,14 @@ public class TrackFragment extends FragmentResponder {
     public static final int PANEL_STATUS_HEIGHT = 48;
 
     @SuppressWarnings("UnusedDeclaration")
-    public static final int PANEL_ACTION_HEIGHT = 72;
+    public static final int PANEL_ACTION_HEIGHT = 98;
 
     @SuppressWarnings("UnusedDeclaration")
     public static final int PANEL_ACTION_WIDTH = 224;
 
-    protected static final String KEY_STATE =  "state";
-    protected static final String KEY_LAST_STATE =  "last_state";
-    protected static final String KEY_WAITING_CALLBACK =  "waiting_callback";
+    protected static final String KEY_STATE = "state";
+    protected static final String KEY_LAST_STATE = "last_state";
+    protected static final String KEY_WAITING_CALLBACK = "waiting_callback";
 
     public interface State {
     }
@@ -100,6 +103,7 @@ public class TrackFragment extends FragmentResponder {
     protected TextView mAverageSpeedTextView;
     protected TextView mStateTextView;
     protected TextView mWaitingLocationTextView;
+    protected TextView mPausedTextView;
 
     protected Button mStartButton;
 
@@ -141,6 +145,7 @@ public class TrackFragment extends FragmentResponder {
         mAverageSpeedTextView = (TextView) view.findViewById(R.id.track_averageSpeedTextView);
         mStateTextView = (TextView) view.findViewById(R.id.track_stateTextView);
         mWaitingLocationTextView = (TextView) view.findViewById(R.id.track_waitingLocationTextView);
+        mPausedTextView = (TextView) view.findViewById(R.id.track_pausedTextView);
     }
 
     protected void findLayoutViews(View view) {
@@ -189,6 +194,42 @@ public class TrackFragment extends FragmentResponder {
     @SuppressWarnings("UnusedDeclaration")
     protected void showWaitingLocationView() {
         mWaitingLocationTextView.setVisibility(View.VISIBLE);
+    }
+
+    protected ArrayList<Label> getLabels(ViewGroup viewGroup) {
+        ArrayList<Label> labels = new ArrayList<>();
+
+        int childCount = viewGroup.getChildCount();
+        for (int i = 0; i < childCount; i++) {
+            View child = viewGroup.getChildAt(i);
+            if (child instanceof ViewGroup) {
+                labels.addAll(getLabels((ViewGroup) child));
+            }
+
+            if (child.getClass() == Label.class) {
+                labels.add((Label) child);
+            }
+        }
+
+        return labels;
+    }
+
+    protected void showLabels() {
+        ArrayList<Label> labels = getLabels((ViewGroup) getView());
+        Iterator<Label> iterator = labels.iterator();
+        while (iterator.hasNext()) {
+            View view = iterator.next();
+            view.setVisibility(View.VISIBLE);
+        }
+    }
+
+    protected void hideLabels() {
+        ArrayList<Label> labels = getLabels((ViewGroup) getView());
+        Iterator<Label> iterator = labels.iterator();
+        while (iterator.hasNext()) {
+            View view = iterator.next();
+            view.setVisibility(View.GONE);
+        }
     }
 
     /**
@@ -243,8 +284,8 @@ public class TrackFragment extends FragmentResponder {
     @SuppressLint("NewApi")
     protected void showPanel(int delay) {
         mSlidingUpPanel.setTouchEnabled(true);
-        int currentapiVersion = android.os.Build.VERSION.SDK_INT;
-        if (currentapiVersion >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+        int currentapiVersion = Build.VERSION.SDK_INT;
+        if (currentapiVersion >= Build.VERSION_CODES.JELLY_BEAN) {
             Choreographer.getInstance().postFrameCallbackDelayed(new Choreographer.FrameCallback() {
                 @Override
                 public void doFrame(long frameTimeNanos) {
@@ -322,19 +363,27 @@ public class TrackFragment extends FragmentResponder {
     }
 
     @SuppressWarnings("UnusedDeclaration")
-    protected void changeDrawableColor(int resourceId, int color, FloatingActionButton actionButton) {
+    protected void changeDrawableColor(int resourceId, int color, FloatingActionButton view) {
         Picasso.with(getActivity())
                 .load(resourceId)
                 .transform(new ColorTransformation(color))
-                .into(actionButton);
+                .into(view);
     }
 
     @SuppressWarnings("UnusedDeclaration")
-    protected void changeDrawableColor(int resourceId, int color, ImageButton actionButton) {
+    protected void changeDrawableColor(int resourceId, int color, ImageButton view) {
         Picasso.with(getActivity())
                 .load(resourceId)
                 .transform(new ColorTransformation(color))
-                .into(actionButton);
+                .into(view);
+    }
+
+    @SuppressWarnings("UnusedDeclaration")
+    protected void changeDrawableColor(int resourceId, int color, ImageView view) {
+        Picasso.with(getActivity())
+                .load(resourceId)
+                .transform(new ColorTransformation(color))
+                .into(view);
     }
 
     @SuppressWarnings("UnusedDeclaration")
@@ -402,8 +451,8 @@ public class TrackFragment extends FragmentResponder {
     }
 
     protected void updateTime() {
-        mCompleteTimeTextView.setText(secondsToString(mTotalSeconds));
-        mTimeTextView.setText(secondsToString(mSectionSeconds));
+        mCompleteTimeTextView.setText(StringUtils.secondsToString(mTotalSeconds));
+        mTimeTextView.setText(StringUtils.secondsToString(mSectionSeconds));
     }
 
     @SuppressWarnings("UnusedDeclaration")
@@ -420,15 +469,6 @@ public class TrackFragment extends FragmentResponder {
     protected void resetSectionStats() {
         mSectionSeconds = 0;
         mBus.post(new ClearSectionTimerEvent());
-    }
-
-    private String secondsToString(long time) {
-        long mins = time / 60;
-        long secs = time % 60;
-
-        String strMin = String.format("%02d", mins);
-        String strSec = String.format("%02d", secs);
-        return String.format("%s:%s", strMin, strSec);
     }
 
     @SuppressWarnings("UnusedDeclaration")

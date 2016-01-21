@@ -42,6 +42,7 @@ public class Route implements JSONable {
     public static final String JSON_TYPE = "route_type";
     public static final String JSON_LOADING_DURATION = "loading_duration";
     public static final String JSON_VEHICLE_ID = "vehicle_id";
+    public static final String JSON_VEHICLE_TYPE_ID = "type_id";
 
     public static class Type {
         public static final int GROUP_VEHICLE = 1;
@@ -58,6 +59,7 @@ public class Route implements JSONable {
     protected Integer mType;
     protected Long mLoadingDuration;
     protected Long mVehicleId;
+    protected Long mVehicleTypeId;
 
     public Route() {
         mId = null;
@@ -160,6 +162,14 @@ public class Route implements JSONable {
         return loadingType == mType;
     }
 
+    public Long getVehicleTypeId() {
+        return mVehicleTypeId;
+    }
+
+    public void setVehicleTypeId(Long vehicleTypeId) {
+        mVehicleTypeId = vehicleTypeId;
+    }
+
     public boolean isEmpty() {
         return mId == null;
     }
@@ -184,6 +194,7 @@ public class Route implements JSONable {
         object.put(JSON_VEHICLE_ID, mVehicleId);
         object.put(JSON_TYPE, mType);
         object.put(JSON_LATITUDE, mLatitude);
+        object.put(JSON_VEHICLE_TYPE_ID, mVehicleTypeId);
         object.put(JSON_LONGITUDE, mLongitude);
         return object;
     }
@@ -204,6 +215,7 @@ public class Route implements JSONable {
         object.put(JSON_TYPE, mType);
         object.put(JSON_LATITUDE, mLatitude);
         object.put(JSON_LONGITUDE, mLongitude);
+        object.put(JSON_VEHICLE_TYPE_ID, mVehicleTypeId);
         return object;
     }
 
@@ -217,6 +229,7 @@ public class Route implements JSONable {
         object.put(JSON_VEHICLE_ID, mVehicleId);
         object.put(JSON_LATITUDE, mLatitude);
         object.put(JSON_LONGITUDE, mLongitude);
+        object.put(JSON_VEHICLE_TYPE_ID, mVehicleTypeId);
 
         RequestParams params = new RequestParams();
         params.put(JSON_WRAPPER, object);

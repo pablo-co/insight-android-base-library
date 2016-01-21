@@ -20,9 +20,26 @@
     <string name="track_distance_placeholder">0.00 km</string>
     <string name="track_speed_placeholder">0.00 kph</string>
 
+    <!-- Actions -->
+    <string name="action_register">Register</string>
+    <string name="action_next">Next</string>
+    <string name="action_done">Done</string>
+    <string name="action_logout">Log out</string>
+    <string name="action_add">Add</string>
+    <string name="action_cancel">cancel</string>
+    <string name="action_send">send</string>
+    <string name="action_edit">Edit</string>
+    <string name="action_destroy">Delete</string>
+    <string name="action_back">Back</string>
+    <string name="action_enter">Enter</string>
+    <string name="action_skip">Skip</string>
+    <string name="action_stop">Stop</string>
+    <string name="action_pause">Pause</string>
+    <string name="action_save">Save</string>
+    <string name="action_ok">Ok</string>
 
-
-    <!-- Strings related to Settings -->
+    <string name="dialog_pause_title">Are you sure?</string>
+    <string name="dialog_pause_message">You are about to pause all tracking.</string>
 
     <!-- Example General settings -->
     <string name="pref_header_general">General</string>
@@ -80,5 +97,9 @@
     <string name="pref_title_show_labels">Show labels above buttons</string>
 
     <string name="pref_title_gps_accelerometer">Use accelerometer to save battery</string>
+
+    <string name="pref_title_logout">Logout</string>
+    <string name="pref_summary_logout">Logout your account from this device.</string>
+    <string name="pref_dialog_logout">Are you sure you wish to logout?</string>
 
 </resources>

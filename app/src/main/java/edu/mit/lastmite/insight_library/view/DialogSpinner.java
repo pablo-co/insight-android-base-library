@@ -14,22 +14,10 @@ public class DialogSpinner extends Spinner {
     }
 
     public DialogSpinner(Context context, AttributeSet attrs, int defStyle) {
-        super(context, attrs, defStyle);
+        super(context, attrs, Spinner.MODE_DIALOG);
     }
 
     public DialogSpinner(Context context, AttributeSet attrs) {
         super(context, attrs);
-    }
-
-    @Override
-    public boolean performClick() {
-        new AlertDialog.Builder(getContext()).setAdapter((ArrayAdapter) getAdapter(),
-                new DialogInterface.OnClickListener() {
-                    @Override public void onClick(DialogInterface dialog, int which) {
-                        setSelection(which);
-                        dialog.dismiss();
-                    }
-                }).create().show();
-        return true;
     }
 }

@@ -44,16 +44,27 @@ public class NetworkTaskQueue extends TaskQueue<NetworkTask> {
         mContext.startService(intent);
     }
 
+    @SuppressWarnings("UnusedDeclaration")
     @Override
     public void add(NetworkTask entry) {
         super.add(entry);
         produceSizeChanged();
     }
 
+    @SuppressWarnings("UnusedDeclaration")
     @Override
     public void remove() {
         super.remove();
         produceSizeChanged();
+    }
+
+    @SuppressWarnings("UnusedDeclaration")
+    public void clear() {
+        try {
+            mDelegate.remove(mDelegate.size());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @SuppressWarnings("UnusedDeclaration")

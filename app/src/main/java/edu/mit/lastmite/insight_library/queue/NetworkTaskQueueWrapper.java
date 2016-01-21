@@ -17,10 +17,12 @@ import java.util.Iterator;
 
 import edu.mit.lastmite.insight_library.service.NetworkQueueService;
 import edu.mit.lastmite.insight_library.task.NetworkTask;
+import edu.mit.lastmite.insight_library.task.QueueHeaderTask;
 
 public class NetworkTaskQueueWrapper {
 
     private static final String PREFERENCES_QUEUE_NAMES = "queue_names";
+
 
     protected final Context mContext;
     protected final Bus mBus;
@@ -66,6 +68,13 @@ public class NetworkTaskQueueWrapper {
         }
     }
 
+    @SuppressWarnings("UnusedDeclaration")
+    public void reloadQueueFromDisk() {
+        if (mQueue != null) {
+            mQueue = retrieveQueue(mQueue.getFileName());
+        }
+    }
+
     public void changeToQueue(String queueName) {
         mQueue = retrieveQueue(queueName);
     }
@@ -81,6 +90,7 @@ public class NetworkTaskQueueWrapper {
     }
 
     public void executeQueue(String queueName) {
+        removeQueueName(queueName);
         launchQueueService(queueName);
     }
 

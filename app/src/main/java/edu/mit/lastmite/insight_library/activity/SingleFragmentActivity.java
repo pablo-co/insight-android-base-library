@@ -40,6 +40,7 @@ import javax.inject.Inject;
 import edu.mit.lastmite.insight_library.R;
 import edu.mit.lastmite.insight_library.util.ApplicationComponent;
 import edu.mit.lastmite.insight_library.util.Helper;
+import edu.mit.lastmite.insight_library.util.ViewUtils;
 
 
 public abstract class SingleFragmentActivity extends DaggerActivity {
@@ -47,7 +48,6 @@ public abstract class SingleFragmentActivity extends DaggerActivity {
     private static final String TAG = "SingleFragmentActivity";
 
 
-    public static final float STATUS_BAR_COLOR_RATE = 0.75f;
 
     /**
      * Should inflate view during the {AppCompatActivity#onCreate}
@@ -129,19 +129,12 @@ public abstract class SingleFragmentActivity extends DaggerActivity {
 
     @SuppressWarnings("UnusedDeclaration")
     public View getActionBarView() {
-        Window window = getWindow();
-        View view = window.getDecorView();
-        int resId = getResources().getIdentifier("action_bar_container", "id", getPackageName());
-        return view.findViewById(resId);
+        return ViewUtils.getActionBarView(this);
     }
 
     @SuppressWarnings("UnusedDeclaration")
     public void setDarkenedStatusBarColor(int color) {
-        int r = Color.red(color);
-        int b = Color.blue(color);
-        int g = Color.green(color);
-        int darkerColor = Color.rgb((int) (r * STATUS_BAR_COLOR_RATE), (int) (g * STATUS_BAR_COLOR_RATE), (int) (b * STATUS_BAR_COLOR_RATE));
-        setStatusBarColor(darkerColor);
+        setStatusBarColor(ViewUtils.getDarkenedColor(color));
     }
 
     @SuppressWarnings("UnusedDeclaration")

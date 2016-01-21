@@ -52,7 +52,7 @@ public class Delivery implements JSONable {
     protected Long mTime;
     protected Double mLatitude;
     protected Double mLongitude;
-    protected Long mOrderId;
+    protected String mOrderId;
     protected Long mVisitId;
     protected Long mRouteId;
 
@@ -80,7 +80,7 @@ public class Delivery implements JSONable {
         mBeyondSegment = object.getBoolean(JSON_BEYOND_SEGMENT);
         mTime = object.getLong(JSON_TIME);
         if (object.has(JSON_ORDER_ID)) {
-            mOrderId = object.getLong(JSON_ORDER_ID);
+            mOrderId = object.getString(JSON_ORDER_ID);
         }
         mVisitId = object.getLong(JSON_VISIT_ID);
         mRouteId = object.getLong(JSON_ROUTE_ID);
@@ -119,11 +119,11 @@ public class Delivery implements JSONable {
         mBeyondSegment = beyondSegment;
     }
 
-    public Long getOrderId() {
+    public String getOrderId() {
         return mOrderId;
     }
 
-    public void setOrderId(Long orderId) {
+    public void setOrderId(String orderId) {
         mOrderId = orderId;
     }
 
