@@ -42,6 +42,7 @@ public class Route implements JSONable {
     public static final String JSON_TYPE = "route_type";
     public static final String JSON_LOADING_DURATION = "loading_duration";
     public static final String JSON_VEHICLE_ID = "vehicle_id";
+    public static final String JSON_CREW_ID = "crew_id";
     public static final String JSON_VEHICLE_TYPE_ID = "type_id";
 
     public static class Type {
@@ -59,6 +60,7 @@ public class Route implements JSONable {
     protected Integer mType;
     protected Long mLoadingDuration;
     protected Long mVehicleId;
+    protected Long mCrewId;
     protected Long mVehicleTypeId;
 
     public Route() {
@@ -70,6 +72,7 @@ public class Route implements JSONable {
         mEndTime = null;
         mLoadingDuration = null;
         mVehicleId = null;
+        mCrewId = null;
         measureTime();
     }
 
@@ -80,7 +83,7 @@ public class Route implements JSONable {
         }
         mId = object.getLong(JSON_ID);
 
-        if (object.has(JSON_VEHICLE_ID)) {
+        if (object.has(JSON_VEHICLE_ID) && !object.isNull(JSON_VEHICLE_ID)) {
             mVehicleId = object.getLong(JSON_VEHICLE_ID);
         }
 
@@ -150,6 +153,14 @@ public class Route implements JSONable {
         mVehicleId = vehicleId;
     }
 
+    public Long getCrewId() {
+        return mCrewId;
+    }
+
+    public void setCrewId(Long crewId) {
+        mCrewId = crewId;
+    }
+
     public Integer getType() {
         return mType;
     }
@@ -196,6 +207,7 @@ public class Route implements JSONable {
         object.put(JSON_LATITUDE, mLatitude);
         object.put(JSON_VEHICLE_TYPE_ID, mVehicleTypeId);
         object.put(JSON_LONGITUDE, mLongitude);
+        object.put(JSON_CREW_ID, mCrewId);
         return object;
     }
 
@@ -216,6 +228,7 @@ public class Route implements JSONable {
         object.put(JSON_LATITUDE, mLatitude);
         object.put(JSON_LONGITUDE, mLongitude);
         object.put(JSON_VEHICLE_TYPE_ID, mVehicleTypeId);
+        object.put(JSON_CREW_ID, mCrewId);
         return object;
     }
 
@@ -230,6 +243,7 @@ public class Route implements JSONable {
         object.put(JSON_LATITUDE, mLatitude);
         object.put(JSON_LONGITUDE, mLongitude);
         object.put(JSON_VEHICLE_TYPE_ID, mVehicleTypeId);
+        object.put(JSON_CREW_ID, mCrewId);
 
         RequestParams params = new RequestParams();
         params.put(JSON_WRAPPER, object);

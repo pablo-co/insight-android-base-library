@@ -63,6 +63,12 @@ public class AppModule {
 
     @Provides
     @Singleton
+    TextSpeaker provideTextSpeaker(Application application) {
+        return new TextSpeaker(application);
+    }
+
+    @Provides
+    @Singleton
     Storage provideStorage(Application application) {
         return new Storage(application);
     }

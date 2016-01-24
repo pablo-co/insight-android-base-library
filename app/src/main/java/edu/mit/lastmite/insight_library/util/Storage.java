@@ -7,8 +7,6 @@ import android.preference.PreferenceManager;
 import javax.inject.Inject;
 
 public class Storage {
-
-    @Inject
     protected transient Application mApplication;
 
     public Storage(Application application) {

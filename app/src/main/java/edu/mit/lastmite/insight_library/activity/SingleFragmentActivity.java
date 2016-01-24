@@ -44,9 +44,7 @@ import edu.mit.lastmite.insight_library.util.ViewUtils;
 
 
 public abstract class SingleFragmentActivity extends DaggerActivity {
-
     private static final String TAG = "SingleFragmentActivity";
-
 
 
     /**

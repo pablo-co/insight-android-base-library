@@ -30,7 +30,7 @@ import edu.mit.lastmite.insight_library.communication.TargetListener;
 import edu.mit.lastmite.insight_library.communication.TargetResponder;
 import edu.mit.lastmite.insight_library.util.ApplicationComponent;
 
-public class FragmentResponder extends DaggerFragment implements TargetResponder {
+public class FragmentResponder extends BaseFragment implements TargetResponder {
 
     int mRequestCode;
     TargetListener mTargetListener;

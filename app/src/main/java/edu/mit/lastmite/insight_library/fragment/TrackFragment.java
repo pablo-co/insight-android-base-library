@@ -121,7 +121,6 @@ public class TrackFragment extends FragmentResponder {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Icepick.restoreInstanceState(this, savedInstanceState);
-        mBus.register(this);
     }
 
     @Override

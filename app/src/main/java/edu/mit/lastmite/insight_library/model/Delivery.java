@@ -35,7 +35,7 @@ import java.util.HashMap;
 public class Delivery implements JSONable {
     public static final String JSON_WRAPPER = "delivery";
     public static final String JSON_ID = "id_delivery";
-    public static final String JSON_TYPE = "type";
+    public static final String JSON_TYPE = "activity";
     public static final String JSON_TIME = "time";
     public static final String JSON_EQUIPMENT = "equipment";
     public static final String JSON_BEYOND_SEGMENT = "beyond_segment";

@@ -22,4 +22,8 @@ public final class StringUtils {
         String strSec = String.format("%02d", secs);
         return String.format("%s:%s", strMin, strSec);
     }
+
+    public static String getLatLngString(double latitude, double longitude) {
+        return String.format("%f,%f", latitude, longitude);
+    }
 }
