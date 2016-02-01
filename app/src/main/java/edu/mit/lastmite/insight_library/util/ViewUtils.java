@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
 import android.support.annotation.LayoutRes;
+import android.support.design.widget.FloatingActionButton;
 import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,7 +12,11 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.squareup.picasso.Picasso;
 
 public final class ViewUtils {
     public static final float STATUS_BAR_COLOR_RATE = 0.75f;
@@ -103,5 +108,26 @@ public final class ViewUtils {
         if (v.getVisibility() != visibility) {
             v.setVisibility(visibility);
         }
+    }
+
+    public static void changeDrawableColor(Context context, int resourceId, int color, FloatingActionButton view) {
+        Picasso.with(context)
+                .load(resourceId)
+                .transform(new ColorTransformation(color))
+                .into(view);
+    }
+
+    public static void changeDrawableColor(Context context, int resourceId, int color, ImageButton view) {
+        Picasso.with(context)
+                .load(resourceId)
+                .transform(new ColorTransformation(color))
+                .into(view);
+    }
+
+    public static void changeDrawableColor(Context context, int resourceId, int color, ImageView view) {
+        Picasso.with(context)
+                .load(resourceId)
+                .transform(new ColorTransformation(color))
+                .into(view);
     }
 }

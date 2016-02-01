@@ -362,30 +362,6 @@ public class TrackFragment extends FragmentResponder {
     }
 
     @SuppressWarnings("UnusedDeclaration")
-    protected void changeDrawableColor(int resourceId, int color, FloatingActionButton view) {
-        Picasso.with(getActivity())
-                .load(resourceId)
-                .transform(new ColorTransformation(color))
-                .into(view);
-    }
-
-    @SuppressWarnings("UnusedDeclaration")
-    protected void changeDrawableColor(int resourceId, int color, ImageButton view) {
-        Picasso.with(getActivity())
-                .load(resourceId)
-                .transform(new ColorTransformation(color))
-                .into(view);
-    }
-
-    @SuppressWarnings("UnusedDeclaration")
-    protected void changeDrawableColor(int resourceId, int color, ImageView view) {
-        Picasso.with(getActivity())
-                .load(resourceId)
-                .transform(new ColorTransformation(color))
-                .into(view);
-    }
-
-    @SuppressWarnings("UnusedDeclaration")
     protected void goToState(State state) {
         mLastState = mState;
         mState = state;

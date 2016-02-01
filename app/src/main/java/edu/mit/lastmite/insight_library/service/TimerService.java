@@ -2,6 +2,7 @@ package edu.mit.lastmite.insight_library.service;
 
 import android.content.Intent;
 import android.os.CountDownTimer;
+import android.os.HandlerThread;
 import android.os.IBinder;
 import android.util.Log;
 
@@ -12,6 +13,8 @@ import javax.inject.Inject;
 
 import edu.mit.lastmite.insight_library.event.ClearSectionTimerEvent;
 import edu.mit.lastmite.insight_library.event.ClearTimerEvent;
+import edu.mit.lastmite.insight_library.event.PauseTimerEvent;
+import edu.mit.lastmite.insight_library.event.StartTimerEvent;
 import edu.mit.lastmite.insight_library.event.StopTimerEvent;
 import edu.mit.lastmite.insight_library.event.TimerEvent;
 import edu.mit.lastmite.insight_library.util.ApplicationComponent;
@@ -26,12 +29,19 @@ public class TimerService extends DaggerService {
 
     protected long mSectionSeconds = 0;
     protected long mTotalSeconds = 0;
+    protected boolean mPaused = false;
 
     protected CountDownTimer mCountDownTimer;
 
     @Override
     public void injectService(ApplicationComponent component) {
         component.inject(this);
+    }
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        mBus.register(this);
     }
 
     @Override
@@ -54,6 +64,7 @@ public class TimerService extends DaggerService {
     public void onDestroy() {
         super.onDestroy();
         stopTimer();
+        mBus.unregister(this);
     }
 
     @SuppressWarnings("UnusedDeclaration")
@@ -71,6 +82,22 @@ public class TimerService extends DaggerService {
 
     @SuppressWarnings("UnusedDeclaration")
     @Subscribe
+    public void onStartEvent(StartTimerEvent event) {
+        if (mPaused) {
+            mPaused = false;
+            startTimer();
+            publishTimerEvent();
+        }
+    }
+
+    @SuppressWarnings("UnusedDeclaration")
+    @Subscribe
+    public void onPauseEvent(PauseTimerEvent event) {
+        mPaused = true;
+    }
+
+    @SuppressWarnings("UnusedDeclaration")
+    @Subscribe
     public void onStopEvent(StopTimerEvent event) {
         stopSelf();
     }
@@ -84,8 +111,10 @@ public class TimerService extends DaggerService {
             public void onFinish() {
                 mTotalSeconds++;
                 mSectionSeconds++;
-                startTimer();
-                publishTimerEvent();
+                if (!mPaused) {
+                    startTimer();
+                    publishTimerEvent();
+                }
             }
         };
         mCountDownTimer.start();

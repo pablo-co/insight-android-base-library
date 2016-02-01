@@ -32,7 +32,7 @@ public class TextSpeaker {
             @Override
             public void onInit(int status) {
                 if(status != TextToSpeech.ERROR) {
-                    mTextToSpeech.setLanguage(Locale.US);
+                    mTextToSpeech.setLanguage(Locale.ENGLISH);
                 }
             }
         });

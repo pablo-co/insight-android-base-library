@@ -26,6 +26,7 @@
 package edu.mit.lastmite.insight_library.fragment;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -34,6 +35,7 @@ import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -55,15 +57,27 @@ import java.util.List;
 import javax.inject.Inject;
 
 import edu.mit.lastmite.insight_library.R;
+import edu.mit.lastmite.insight_library.annotation.ServiceConstant;
 import edu.mit.lastmite.insight_library.event.ClearMapEvent;
 import edu.mit.lastmite.insight_library.event.TrackEvent;
 import edu.mit.lastmite.insight_library.model.Location;
 import edu.mit.lastmite.insight_library.util.ApplicationComponent;
 import edu.mit.lastmite.insight_library.util.Helper;
+import edu.mit.lastmite.insight_library.util.ServiceUtils;
+import edu.mit.lastmite.insight_library.util.ViewUtils;
+import edu.mit.lastmite.insight_library.view.TouchFrameLayout;
 
 public class InsightMapsFragment extends BaseFragment implements SensorEventListener, GoogleMap.OnCameraChangeListener {
+    @ServiceConstant
+    public static String EXTRA_FLAGS;
 
-    public static final String EXTRA_FLAGS = "edu.mit.lastmite.insight_library.extra_flags";
+    public static final float MAP_TILT = 45.0f;
+    public static final int DISABLED_COLOR = Color.rgb(100, 100, 100);
+    public static final int HIGHLIGHT_COLOR = Color.rgb(40, 111, 181);
+
+    static {
+        ServiceUtils.populateConstants(InsightMapsFragment.class);
+    }
 
     @Inject
     protected Helper mHelper;
@@ -78,20 +92,27 @@ public class InsightMapsFragment extends BaseFragment implements SensorEventList
     protected Location mLastLocation;
     protected LatLng mMapFocus;
     protected boolean mAutomaticFocus = true;
+    protected State mState = State.CURRENT_LOCATION;
 
     protected ArrayList<LatLng> mTrackingPoints;
     protected SensorManager mSensorManager;
 
     protected MapView mMapView;
     protected ArrayList<Marker> mMarkers;
-    protected FloatingActionButton mLocationButton;
-    protected FloatingActionButton mRotationButton;
+    protected FloatingActionButton mActionButton;
+    protected TouchFrameLayout mTouchLayout;
 
     public class Flags {
         public static final int DRAW_PATH = 1;
         public static final int DRAW_MARKER = 2;
         public static final int DRAW_TRACKS = 4;
         public static final int ROTATE_WITH_DEVICE = 8;
+    }
+
+    public enum State {
+        CURRENT_LOCATION,
+        ROTATION,
+        FREE
     }
 
     public static InsightMapsFragment newInstance(int flags) {
@@ -127,32 +148,34 @@ public class InsightMapsFragment extends BaseFragment implements SensorEventList
         mMapView.onCreate(savedInstanceState);
         setUpMap();
 
-        mLocationButton = (FloatingActionButton) view.findViewById(R.id.locationButton);
-        if (shouldDrawPath() || shouldDrawMarker()) {
-            mLocationButton.setOnClickListener(new View.OnClickListener() {
+        mTouchLayout = (TouchFrameLayout) view.findViewById(R.id.touchLayout);
+
+        mTouchLayout.setOnDragListener(new TouchFrameLayout.OnDragListener() {
+            @Override
+            public void onDrag(MotionEvent motionEvent) {
+                mState = State.FREE;
+                applyLocationPolicy();
+            }
+        });
+
+        mActionButton = (FloatingActionButton) view.findViewById(R.id.actionButton);
+        if (shouldShowActionButton()) {
+            mActionButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     switchLocationPolicy();
                 }
             });
         } else {
-            mLocationButton.setVisibility(View.GONE);
+            mActionButton.setVisibility(View.GONE);
         }
 
-        mRotationButton = (FloatingActionButton) view.findViewById(R.id.rotationButton);
         if (shouldRotateWithDevice()) {
             applySensorRotation();
-            mRotationButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    switchSensorRotation();
-                }
-            });
-        } else {
-            mRotationButton.setVisibility(View.GONE);
         }
 
         changeGestures(!mAutomaticFocus);
+        applyLocationPolicy();
 
         return view;
     }
@@ -179,7 +202,6 @@ public class InsightMapsFragment extends BaseFragment implements SensorEventList
 
     @Override
     public void onCameraChange(CameraPosition position) {
-        //mAutomaticFocus = false;
     }
 
     protected void registerSensor() {
@@ -193,27 +215,70 @@ public class InsightMapsFragment extends BaseFragment implements SensorEventList
         mSensorManager.unregisterListener(this);
     }
 
-    protected void switchSensorRotation() {
-        mSensorRotate = !mSensorRotate;
+    protected void switchSensorRotation(boolean shouldRotate) {
+        mSensorRotate = shouldRotate;
         applySensorRotation();
     }
 
     protected void applySensorRotation() {
         if (mSensorRotate) {
-            setFabDrawable();
             registerSensor();
             saveMapFocus();
         } else {
-            setFabDarkenedDrawable();
             unregisterSensor();
         }
     }
 
     protected void switchLocationPolicy() {
-        //mAutomaticFocus = true;
-        mAutomaticFocus = !mAutomaticFocus;
-        changeGestures(!mAutomaticFocus);
+        switch (mState) {
+            case CURRENT_LOCATION:
+                mState = State.ROTATION;
+                break;
+            case ROTATION:
+                mState = State.CURRENT_LOCATION;
+                break;
+            case FREE:
+                mState = State.CURRENT_LOCATION;
+                break;
+        }
+        applyLocationPolicy();
+    }
+
+    protected void applyLocationPolicy() {
+        switch (mState) {
+            case CURRENT_LOCATION:
+                stopRotation();
+                startCurrentLocation();
+                break;
+            case ROTATION:
+                startRotation();
+                break;
+            case FREE:
+                stopRotation();
+                startFree();
+                break;
+        }
+    }
+
+    protected void startCurrentLocation() {
+        ViewUtils.changeDrawableColor(getContext(), R.mipmap.ic_location_target, HIGHLIGHT_COLOR, mActionButton);
         centerToLastLocation();
+        mAutomaticFocus = true;
+    }
+
+    protected void startRotation() {
+        ViewUtils.changeDrawableColor(getContext(), R.mipmap.ic_compass, HIGHLIGHT_COLOR, mActionButton);
+        switchSensorRotation(true);
+        mAutomaticFocus = true;
+    }
+
+    protected void stopRotation() {
+        switchSensorRotation(false);
+    }
+
+    protected void startFree() {
+        mAutomaticFocus = false;
+        ViewUtils.changeDrawableColor(getContext(), R.mipmap.ic_location_target, DISABLED_COLOR, mActionButton);
     }
 
     protected void centerToLastLocation() {
@@ -223,7 +288,7 @@ public class InsightMapsFragment extends BaseFragment implements SensorEventList
     }
 
     protected void changeGestures(boolean enabled) {
-        mGoogleMap.getUiSettings().setAllGesturesEnabled(enabled);
+        //mGoogleMap.getUiSettings().setAllGesturesEnabled(enabled);
     }
 
     protected void saveMapFocus() {
@@ -241,6 +306,10 @@ public class InsightMapsFragment extends BaseFragment implements SensorEventList
     /**
      * Flags
      */
+
+    protected boolean shouldShowActionButton() {
+        return shouldDrawMarker() | shouldDrawPath() | shouldRotateWithDevice();
+    }
 
     protected boolean shouldRotateWithDevice() {
         return mHelper.isFlagActivated(mFlags, Flags.ROTATE_WITH_DEVICE);
@@ -275,6 +344,7 @@ public class InsightMapsFragment extends BaseFragment implements SensorEventList
         if (mLastLocation != null) {
             CameraPosition oldPos = mGoogleMap.getCameraPosition();
             CameraPosition pos = CameraPosition.builder(oldPos)
+                    .tilt(MAP_TILT)
                     .bearing(bearing)
                     .target(mMapFocus)
                     .build();
@@ -329,23 +399,6 @@ public class InsightMapsFragment extends BaseFragment implements SensorEventList
         clearMap();
     }
 
-    /* Views */
-    protected void setFabDrawable() {
-        Drawable drawable = getResources().getDrawable(R.mipmap.ic_compass);
-        drawable.setAlpha(255);
-        mRotationButton.setImageDrawable(drawable);
-    }
-
-    protected void setFabDarkenedDrawable() {
-        mRotationButton.setImageDrawable(getDarkenedDrawable(R.mipmap.ic_compass));
-    }
-
-    protected Drawable getDarkenedDrawable(int id) {
-        Drawable drawable = getResources().getDrawable(id);
-        drawable.setAlpha(200);
-        return drawable;
-    }
-
     protected void removeMarker() {
         mGoogleMap.clear();
     }
@@ -391,6 +444,8 @@ public class InsightMapsFragment extends BaseFragment implements SensorEventList
     }
 
     protected void clearMap() {
+        mTrackingPoints = new ArrayList<>();
+        mMarkers = new ArrayList<>();
         mGoogleMap.clear();
     }
 }

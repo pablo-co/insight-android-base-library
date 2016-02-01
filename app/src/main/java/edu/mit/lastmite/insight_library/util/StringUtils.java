@@ -15,12 +15,14 @@ public final class StringUtils {
     }
 
     public static String secondsToString(long time) {
+        long hours = time / 3600;
         long mins = time / 60;
         long secs = time % 60;
 
+        String strHour = String.format("%02d", hours);
         String strMin = String.format("%02d", mins);
         String strSec = String.format("%02d", secs);
-        return String.format("%s:%s", strMin, strSec);
+        return String.format("%s:%s:%s", strHour, strMin, strSec);
     }
 
     public static String getLatLngString(double latitude, double longitude) {
