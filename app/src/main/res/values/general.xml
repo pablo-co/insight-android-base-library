@@ -22,5 +22,5 @@
     <string name="secret_keys">secret_keys</string>
     <string name="base_url"></string>
     <string name="end_point"></string>
-
+    <string name="sentry_api">https://bf6fb70bb23d4c168c2cd31986c64e81:dff32a2aa77a43b592ed8ca8b5cf53e8@app.getsentry.com/46864</string>
 </resources>

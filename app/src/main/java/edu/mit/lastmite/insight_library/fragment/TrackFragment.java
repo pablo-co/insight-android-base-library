@@ -3,9 +3,13 @@ package edu.mit.lastmite.insight_library.fragment;
 import android.animation.ArgbEvaluator;
 import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.view.Choreographer;
@@ -45,6 +49,7 @@ import edu.mit.lastmite.insight_library.util.ApplicationComponent;
 import edu.mit.lastmite.insight_library.util.ColorTransformation;
 import edu.mit.lastmite.insight_library.util.Helper;
 import edu.mit.lastmite.insight_library.util.StringUtils;
+import edu.mit.lastmite.insight_library.util.SysUtils;
 import icepick.Icepick;
 
 public class TrackFragment extends FragmentResponder {
@@ -112,6 +117,8 @@ public class TrackFragment extends FragmentResponder {
     protected FrameLayout mOverlayLayout;
     protected SlidingUpPanelLayout mSlidingUpPanel;
 
+    protected AlertDialog mAlertDialog;
+
     @Override
     public void injectFragment(ApplicationComponent component) {
         component.inject(this);
@@ -123,10 +130,23 @@ public class TrackFragment extends FragmentResponder {
         Icepick.restoreInstanceState(this, savedInstanceState);
     }
 
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        checkIfGpsEnabled();
+    }
+
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         Icepick.saveInstanceState(this, outState);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (mAlertDialog != null) {
+            mAlertDialog.dismiss();
+        }
     }
 
     @SuppressWarnings("UnusedDeclaration")
@@ -371,6 +391,25 @@ public class TrackFragment extends FragmentResponder {
     protected void updateStateView() {
         String label = "";
         mStateTextView.setText(label);
+    }
+
+    protected void checkIfGpsEnabled() {
+        if (!SysUtils.isGPSEnabled(getContext())) {
+            buildAlertMessageNoGps();
+        }
+    }
+
+    protected void buildAlertMessageNoGps() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setMessage(getString(R.string.dialog_gps_title))
+                .setCancelable(false)
+                .setPositiveButton(getString(R.string.action_ok), new DialogInterface.OnClickListener() {
+                    public void onClick(@SuppressWarnings("unused") final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
+                        startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+                    }
+                });
+        mAlertDialog = builder.create();
+        mAlertDialog.show();
     }
 
     /**
