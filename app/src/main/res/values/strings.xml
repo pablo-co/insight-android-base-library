@@ -96,6 +96,9 @@
 
     <string name="pref_title_show_labels">Show labels above buttons</string>
 
+    <string name="pref_title_show_extra_kpi">Show extra KPIs</string>
+    <string name="pref_summary_show_extra_kpi">Show speed and average speed KPIs in the tracking view</string>
+
     <string name="pref_title_gps_accelerometer">Use accelerometer to save battery</string>
 
     <string name="pref_title_text_to_speech">Text to Speech</string>

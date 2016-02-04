@@ -115,6 +115,7 @@ public class TrackFragment extends FragmentResponder {
     protected TableLayout mStatsLayout;
     protected FrameLayout mStatusLayout;
     protected FrameLayout mOverlayLayout;
+    protected View mSpeedLayout;
     protected SlidingUpPanelLayout mSlidingUpPanel;
 
     protected AlertDialog mAlertDialog;
@@ -171,6 +172,7 @@ public class TrackFragment extends FragmentResponder {
         mStatsLayout = (TableLayout) view.findViewById(R.id.track_statsLayout);
         mStatusLayout = (FrameLayout) view.findViewById(R.id.track_statusLayout);
         mOverlayLayout = (FrameLayout) view.findViewById(R.id.track_overlayLayout);
+        mSpeedLayout = view.findViewById(R.id.track_speedLayout);
     }
 
     protected void findButtonViews(View view) {
@@ -249,6 +251,10 @@ public class TrackFragment extends FragmentResponder {
             View view = iterator.next();
             view.setVisibility(View.GONE);
         }
+    }
+
+    protected void hideSpeedKPIs() {
+        mSpeedLayout.setVisibility(View.GONE);
     }
 
     /**
