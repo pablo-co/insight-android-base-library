@@ -25,27 +25,23 @@
 
 package edu.mit.lastmite.insight_library.model;
 
-import android.os.Parcel;
-import android.os.Parcelable;
-
 import com.loopj.android.http.RequestParams;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 
-public class Visit implements JSONable, Parcelable {
-    public static final String JSON_WRAPPER = "visit";
-    public static final String JSON_ID = "id_visit";
+public class Pause implements JSONable {
+    public static final String JSON_WRAPPER = "pause";
+    public static final String JSON_ID = "id_pause";
     public static final String JSON_START_TIME = "start_time";
     public static final String JSON_END_TIME = "end_time";
     public static final String JSON_LATITUDE_START = "lat1";
     public static final String JSON_LONGITUDE_START = "lng1";
     public static final String JSON_LATITUDE_END = "lat2";
     public static final String JSON_LONGITUDE_END = "lng2";
-    public static final String JSON_CSTOP_ID = "cstop_id";
+    public static final String JSON_ROUTE_ID = "route_id";
 
     protected Long mId;
     protected Long mStartTime;
@@ -54,10 +50,9 @@ public class Visit implements JSONable, Parcelable {
     protected Double mLongitudeStart;
     protected Double mLatitudeEnd;
     protected Double mLongitudeEnd;
-    protected Long mCStopId;
-    protected transient ArrayList<Location> mLocations;
+    protected Long mRouteId;
 
-    public Visit() {
+    public Pause() {
         mId = null;
         mStartTime = null;
         mEndTime = null;
@@ -65,30 +60,18 @@ public class Visit implements JSONable, Parcelable {
         mLongitudeStart = null;
         mLatitudeEnd = null;
         mLongitudeEnd = null;
-        mCStopId = null;
+        mRouteId = null;
         measureTime();
     }
 
-    public Visit(Parcel in) {
-        mId = (Long) in.readValue(Long.class.getClassLoader());
-        mStartTime = in.readLong();
-        mEndTime = in.readLong();
-        mLatitudeStart = in.readDouble();
-        mLongitudeStart = in.readDouble();
-        mLatitudeEnd = in.readDouble();
-        mLongitudeEnd = in.readDouble();
-        mCStopId = in.readLong();
-        mLocations = in.readArrayList(Location.class.getClassLoader());
-    }
-
-    public Visit(JSONObject json) throws JSONException {
+    public Pause(JSONObject json) throws JSONException {
         JSONObject object = json.getJSONObject(JSON_WRAPPER);
         mId = object.getLong(JSON_ID);
         mLatitudeStart = object.getDouble(JSON_LATITUDE_START);
         mLongitudeStart = object.getDouble(JSON_LONGITUDE_END);
         mLatitudeEnd = object.getDouble(JSON_LATITUDE_END);
         mLongitudeEnd = object.getDouble(JSON_LONGITUDE_END);
-        mCStopId = object.getLong(JSON_CSTOP_ID);
+        mRouteId =  object.getLong(JSON_ROUTE_ID);
         measureTime();
     }
 
@@ -148,25 +131,18 @@ public class Visit implements JSONable, Parcelable {
         mLongitudeEnd = longitudeEnd;
     }
 
-    public Long getCStopId() {
-        return mCStopId;
+    public Long getRouteId() {
+        return mRouteId;
     }
 
-    public void setCStopId(Long CStopId) {
-        mCStopId = CStopId;
+    public void setRouteId(Long routeId) {
+        mRouteId = routeId;
     }
 
     public boolean isEmpty() {
         return mId == null;
     }
 
-    public ArrayList<Location> getLocations() {
-        return mLocations;
-    }
-
-    public void setLocations(ArrayList<Location> locations) {
-        mLocations = locations;
-    }
 
     public void measureTime() {
         if (mStartTime == null) {
@@ -184,10 +160,10 @@ public class Visit implements JSONable, Parcelable {
         object.put(JSON_START_TIME, mStartTime);
         object.put(JSON_END_TIME, mEndTime);
         object.put(JSON_LATITUDE_START, mLatitudeStart);
-        object.put(JSON_LONGITUDE_START, mLongitudeStart);
+        object.put(JSON_LONGITUDE_START, mLongitudeEnd);
         object.put(JSON_LATITUDE_END, mLatitudeEnd);
         object.put(JSON_LONGITUDE_END, mLongitudeEnd);
-        object.put(JSON_CSTOP_ID, mCStopId);
+        object.put(JSON_ROUTE_ID, mRouteId);
         return object;
     }
 
@@ -206,7 +182,7 @@ public class Visit implements JSONable, Parcelable {
         object.put(JSON_LONGITUDE_START, mLongitudeEnd);
         object.put(JSON_LATITUDE_END, mLatitudeEnd);
         object.put(JSON_LONGITUDE_END, mLongitudeEnd);
-        object.put(JSON_CSTOP_ID, mCStopId);
+        object.put(JSON_ROUTE_ID, mRouteId);
         return object;
     }
 
@@ -216,41 +192,14 @@ public class Visit implements JSONable, Parcelable {
         object.put(JSON_START_TIME, mStartTime);
         object.put(JSON_END_TIME, mEndTime);
         object.put(JSON_LATITUDE_START, mLatitudeStart);
-        object.put(JSON_LONGITUDE_START, mLongitudeEnd);
+        object.put(JSON_LONGITUDE_START, mLongitudeStart);
         object.put(JSON_LATITUDE_END, mLatitudeEnd);
         object.put(JSON_LONGITUDE_END, mLongitudeEnd);
-        object.put(JSON_CSTOP_ID, mCStopId);
+        object.put(JSON_ROUTE_ID, mRouteId);
+
         RequestParams params = new RequestParams();
         params.put(JSON_WRAPPER, object);
         return params;
     }
-
-    @Override
-    public int describeContents() {
-        return hashCode();
-    }
-
-    @Override
-    public void writeToParcel(Parcel out, int flags) {
-        out.writeValue(mId);
-        out.writeValue(mStartTime);
-        out.writeValue(mEndTime);
-        out.writeValue(mLatitudeStart);
-        out.writeValue(mLongitudeStart);
-        out.writeValue(mLatitudeEnd);
-        out.writeValue(mLongitudeEnd);
-        out.writeValue(mCStopId);
-        out.writeValue(mLocations);
-    }
-
-    public static final Parcelable.Creator CREATOR = new Parcelable.Creator() {
-        public User createFromParcel(Parcel in) {
-            return new User(in);
-        }
-
-        public User[] newArray(int size) {
-            return new User[size];
-        }
-    };
 
 }

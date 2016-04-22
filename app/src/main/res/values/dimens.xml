@@ -60,4 +60,17 @@
 
     <dimen name="article_about_author_height">48dp</dimen>
     <dimen name="article_about_comment_header_height">48dp</dimen>
+
+    <dimen name="mini_margin">8dp</dimen>
+    <dimen name="small_margin">16dp</dimen>
+    <dimen name="medium_margin">24dp</dimen>
+    <dimen name="large_margin">32dp</dimen>
+
+    <dimen name="small_text">14sp</dimen>
+    <dimen name="medium_text">18sp</dimen>
+    <dimen name="large_text">22sp</dimen>
+
+    <dimen name="small_image">32dp</dimen>
+    <dimen name="medium_image">40dp</dimen>
+    <dimen name="large_image">48dp</dimen>
 </resources>

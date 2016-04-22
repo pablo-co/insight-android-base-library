@@ -2,8 +2,7 @@ package edu.mit.lastmite.insight_library.fragment;
 
 
 import android.os.Bundle;
-
-import com.rey.material.app.DialogFragment;
+import android.support.v4.app.DialogFragment;
 
 import edu.mit.lastmite.insight_library.BaseLibrary;
 import edu.mit.lastmite.insight_library.util.ApplicationComponent;

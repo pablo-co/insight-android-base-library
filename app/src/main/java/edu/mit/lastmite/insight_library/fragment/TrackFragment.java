@@ -41,6 +41,7 @@ import java.util.Iterator;
 import javax.inject.Inject;
 
 import edu.mit.lastmite.insight_library.R;
+import edu.mit.lastmite.insight_library.event.ClearMapEvent;
 import edu.mit.lastmite.insight_library.event.ClearSectionTimerEvent;
 import edu.mit.lastmite.insight_library.event.ClearTimerEvent;
 import edu.mit.lastmite.insight_library.event.TimerEvent;
@@ -109,6 +110,7 @@ public class TrackFragment extends FragmentResponder {
     protected TextView mStateTextView;
     protected TextView mWaitingLocationTextView;
     protected TextView mPausedTextView;
+    protected Button mVehicleButton;
 
     protected Button mStartButton;
 
@@ -177,6 +179,7 @@ public class TrackFragment extends FragmentResponder {
 
     protected void findButtonViews(View view) {
         mStartButton = (Button) view.findViewById(R.id.track_startButton);
+        mVehicleButton = (Button) view.findViewById(R.id.track_vehicleButton);
     }
 
     protected void findPanelLayout(View view, int resourceId) {
@@ -203,6 +206,7 @@ public class TrackFragment extends FragmentResponder {
     protected void hideAllViews() {
         mStatsLayout.setVisibility(View.GONE);
         mStartButton.setVisibility(View.GONE);
+        mVehicleButton.setVisibility(View.GONE);
         mTimeTextView.setVisibility(View.GONE);
         mWaitingLocationTextView.setVisibility(View.GONE);
     }
@@ -483,6 +487,11 @@ public class TrackFragment extends FragmentResponder {
         mSectionSeconds = 0;
         mTotalSeconds = 0;
         mBus.post(new ClearTimerEvent());
+    }
+
+    @SuppressWarnings("UnusedDeclaration")
+    protected void resetMap() {
+        mBus.post(new ClearMapEvent());
     }
 
     @SuppressWarnings("UnusedDeclaration")

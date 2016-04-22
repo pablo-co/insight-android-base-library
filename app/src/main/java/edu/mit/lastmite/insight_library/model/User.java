@@ -43,11 +43,11 @@ public class User implements JSONable, Parcelable {
     public static final String JSON_EMAIL = "email";
     public static final String JSON_PASSWORD = "password";
 
-    private Long mId;
-    private String mAccessToken;
-    private String mEmail;
-    private Long mCompanyId;
-    private String mPassword;
+    protected Long mId;
+    protected String mAccessToken;
+    protected String mEmail;
+    protected Long mCompanyId;
+    protected String mPassword;
 
     public User() {
         mId = null;

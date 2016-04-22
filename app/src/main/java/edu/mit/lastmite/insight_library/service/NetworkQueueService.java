@@ -56,7 +56,7 @@ public class NetworkQueueService extends DaggerIntentService implements NetworkT
         String queueName = getQueueName(intent);
         mQueue = createQueue(queueName);
         init();
-        return START_STICKY;
+        return START_NOT_STICKY;
     }
 
     protected void init() {

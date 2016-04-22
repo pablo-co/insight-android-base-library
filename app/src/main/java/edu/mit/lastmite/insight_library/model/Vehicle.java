@@ -36,16 +36,16 @@ public class Vehicle implements JSONable {
     public static final String JSON_WRAPPER = "vehicle";
     public static final String JSON_ID = "id_vehicle";
     public static final String JSON_IDENTIFIER = "identifier";
-    public static final String JSON_PASSWORD = "password";
+    public static final String JSON_COMPANY_ID = "company_id";
 
     protected Long mId;
     protected String mIdentifier;
-    protected String mPassword;
+    protected Long mCompanyId;
 
     public Vehicle() {
         mId = null;
         mIdentifier = null;
-        mPassword = null;
+        mCompanyId = null;
     }
 
     public Vehicle(JSONObject json) throws JSONException {
@@ -74,12 +74,12 @@ public class Vehicle implements JSONable {
         mIdentifier = identifier;
     }
 
-    public String getPassword() {
-        return mPassword;
+    public Long getCompanyId() {
+        return mCompanyId;
     }
 
-    public void setPassword(String password) {
-        mPassword = password;
+    public void setCompanyId(Long companyId) {
+        mCompanyId = companyId;
     }
 
     public boolean isEmpty() {
@@ -90,7 +90,7 @@ public class Vehicle implements JSONable {
         JSONObject object = new JSONObject();
         object.put(JSON_ID, mId);
         object.put(JSON_IDENTIFIER, mIdentifier);
-        object.put(JSON_PASSWORD, mPassword);
+        object.put(JSON_COMPANY_ID, mCompanyId);
         return object;
     }
 
@@ -104,14 +104,14 @@ public class Vehicle implements JSONable {
         HashMap<String, Object> object = new HashMap<>();
         object.put(JSON_ID, mId);
         object.put(JSON_IDENTIFIER, mIdentifier);
-        object.put(JSON_PASSWORD, mPassword);
+        object.put(JSON_COMPANY_ID, mCompanyId);
         return object;
     }
 
     public RequestParams buildParams() {
         HashMap<String, Object> object = toHashMap();
         object.put(JSON_IDENTIFIER, mIdentifier);
-        object.put(JSON_PASSWORD, mPassword);
+        object.put(JSON_COMPANY_ID, mCompanyId);
 
         RequestParams params = new RequestParams();
         params.put(JSON_WRAPPER, object);

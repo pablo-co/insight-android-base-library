@@ -361,11 +361,6 @@ public class InsightMapsFragment extends BaseFragment implements SensorEventList
     @Subscribe
     public void onLocationEvent(Location location) {
         mLastLocation = location;
-
-        if (shouldDrawMarker() || shouldDrawPath()) {
-            clearMap();
-        }
-
         if (shouldDrawMarker()) {
             addMarkerToMap(location.getLatitude(), location.getLongitude());
             if (mAutomaticFocus) {
@@ -400,7 +395,9 @@ public class InsightMapsFragment extends BaseFragment implements SensorEventList
     }
 
     protected void removeMarker() {
-        mGoogleMap.clear();
+        if (mGoogleMap != null) {
+            mGoogleMap.clear();
+        }
     }
 
     protected void addMarkerToMap(double latitude, double longitude) {
@@ -446,6 +443,8 @@ public class InsightMapsFragment extends BaseFragment implements SensorEventList
     protected void clearMap() {
         mTrackingPoints = new ArrayList<>();
         mMarkers = new ArrayList<>();
-        mGoogleMap.clear();
+        if (mGoogleMap != null) {
+            mGoogleMap.clear();
+        }
     }
 }

@@ -27,8 +27,8 @@ public class BaseFragment extends DaggerFragment {
     }
 
     @Override
-    public void onDetach() {
-        super.onDetach();
+    public void onDestroy() {
+        super.onDestroy();
         mBus.unregister(this);
     }
 }
